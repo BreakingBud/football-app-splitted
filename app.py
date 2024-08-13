@@ -22,4 +22,11 @@ selected_page = st.sidebar.radio("Go to", list(pages.keys()))
 
 # Load the selected page as a module
 page = pages[selected_page]
-exec(open(f"{page}.py").read())
+
+# Error handling for file execution
+try:
+    exec(open(f"{page}.py").read())
+except FileNotFoundError:
+    st.error(f"Page '{page}' not found. Please check the file path.")
+except Exception as e:
+    st.error(f"An error occurred while loading the page '{page}': {str(e)}")
