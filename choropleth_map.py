@@ -32,6 +32,13 @@ metric = st.selectbox(
     index=0
 )
 
+# Dropdown for projection type
+projection_type = st.selectbox(
+    "Select Projection Type",
+    options=["Orthographic (Spherical)", "Equirectangular (Flat)"],
+    index=0
+)
+
 # Aggregate matches, wins, draws, and losses by country
 country_metrics = results_df.copy()
 country_metrics['country'] = country_metrics['home_team']  # Assuming country data is in 'home_team'
@@ -53,7 +60,13 @@ country_metrics = country_metrics.groupby('country').agg(
     losses=('loss', 'sum')
 ).reset_index()
 
-# Generate the spherical choropleth map based on the selected metric
+# Determine the projection type based on user selection
+if projection_type == "Orthographic (Spherical)":
+    selected_projection = 'orthographic'
+else:
+    selected_projection = 'equirectangular'
+
+# Generate the choropleth map based on the selected metric and projection type
 fig = go.Figure()
 
 fig.add_trace(
@@ -67,10 +80,10 @@ fig.add_trace(
     )
 )
 
-# Update the layout for a spherical map with a transparent background
+# Update the layout for the selected projection type and transparent background
 fig.update_layout(
     geo=dict(
-        projection_type='orthographic',  # Makes the map spherical
+        projection_type=selected_projection,  # Set the projection type based on user selection
         showcoastlines=True,
         coastlinecolor="white",
         showland=True,
