@@ -1,7 +1,7 @@
 import streamlit as st
 
 # Set up the app configuration
-st.experimental_set_page_config(
+st.set_page_config(
     page_title="Football Analysis App",
     layout="wide",
     initial_sidebar_state="expanded",
