@@ -23,9 +23,21 @@ def show_player_analysis():
     player1_data = goalscorers_df.loc[goalscorers_df['scorer'] == player1].copy()
     player2_data = goalscorers_df.loc[goalscorers_df['scorer'] == player2].copy()
 
-    # Ensure 'date' is in datetime format
-    player1_data.loc[:, 'date'] = pd.to_datetime(player1_data['date'], errors='coerce')
-    player2_data.loc[:, 'date'] = pd.to_datetime(player2_data['date'], errors='coerce')
+    # Ensure 'date' is in datetime format and handle any conversion errors
+    try:
+        player1_data['date'] = pd.to_datetime(player1_data['date'], errors='coerce')
+        player2_data['date'] = pd.to_datetime(player2_data['date'], errors='coerce')
+    except Exception as e:
+        st.error(f"Error converting dates: {e}")
+        return
+
+    # Drop rows with NaT values in the date column (in case conversion failed for some rows)
+    player1_data = player1_data.dropna(subset=['date'])
+    player2_data = player2_data.dropna(subset=['date'])
+
+    if player1_data.empty or player2_data.empty:
+        st.warning("No data available for the selected players.")
+        return
 
     # Group data by year and count goals
     player1_goals = player1_data.groupby(player1_data['date'].dt.year)['scorer'].count().reset_index(name=f'{player1} Goals')
