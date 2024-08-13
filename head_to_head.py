@@ -1,8 +1,20 @@
 import streamlit as st
+import pandas as pd
 import plotly.express as px
 from data_loader import load_data
 
+# Load the data
 goalscorers_df, results_df, shootouts_df = load_data()
+
+# Ensure the 'date' column is in datetime format
+results_df['date'] = pd.to_datetime(results_df['date'], errors='coerce')
+
+# Drop rows with NaT values in 'date' after conversion
+results_df = results_df.dropna(subset=['date'])
+
+# Set a reasonable minimum date
+min_date = results_df['date'].min()
+max_date = results_df['date'].max()
 
 def show_head_to_head():
     st.title("Head-to-Head Analysis")
@@ -10,11 +22,13 @@ def show_head_to_head():
     team2 = st.selectbox('Select Team 2', results_df['home_team'].unique())
     tournament = st.selectbox('Select Tournament', ['All'] + sorted(results_df['tournament'].unique().tolist()))
     tournament = '' if tournament == 'All' else tournament
+
+    # Set the slider to the range of valid dates in the data
     start_date, end_date = st.slider(
         'Select Date Range',
-        min_value=results_df['date'].min().to_pydatetime(),
-        max_value=results_df['date'].max().to_pydatetime(),
-        value=(results_df['date'].min().to_pydatetime(), results_df['date'].max().to_pydatetime()),
+        min_value=min_date.to_pydatetime(),
+        max_value=max_date.to_pydatetime(),
+        value=(min_date.to_pydatetime(), max_date.to_pydatetime()),
         format="YYYY-MM-DD"
     )
 
