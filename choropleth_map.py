@@ -16,25 +16,29 @@ Use the map below to visualize the geographic distribution of football matches b
 # Dropdown for metric selection
 metric = st.selectbox(
     "Select Metric",
-    options=["matches", "wins", "draws"],
+    options=["matches", "wins", "draws", "losses"],
     index=0
 )
 
-# Aggregate matches, wins, and draws by country
+# Aggregate matches, wins, draws, and losses by country
 country_metrics = results_df.copy()
 country_metrics['country'] = country_metrics['home_team']  # Assuming country data is in 'home_team'
 
 country_metrics['win'] = country_metrics.apply(
-    lambda row: 1 if row['outcome'] in [row['home_team'], row['away_team']] else 0, axis=1
+    lambda row: 1 if row['outcome'] == row['home_team'] or row['outcome'] == row['away_team'] else 0, axis=1
 )
 country_metrics['draw'] = country_metrics.apply(
     lambda row: 1 if row['outcome'] == 'Draw' else 0, axis=1
+)
+country_metrics['loss'] = country_metrics.apply(
+    lambda row: 1 if row['outcome'] != 'Draw' and row['outcome'] != row['home_team'] and row['outcome'] != row['away_team'] else 0, axis=1
 )
 
 country_metrics = country_metrics.groupby('country').agg(
     matches=('date', 'count'),
     wins=('win', 'sum'),
-    draws=('draw', 'sum')
+    draws=('draw', 'sum'),
+    losses=('loss', 'sum')
 ).reset_index()
 
 # Generate the choropleth map based on the selected metric
