@@ -5,13 +5,6 @@ from data_loader import load_data
 # Load the data
 goalscorers_df, results_df, shootouts_df = load_data()
 
-# Prepare data for choropleth map
-country_metrics = results_df.groupby('country').agg(
-    matches=('date', 'count'),
-    wins=('outcome', lambda x: (x == results_df['home_team']).sum()),
-    draws=('outcome', lambda x: (x == 'Draw').sum())
-).reset_index()
-
 # Set up the choropleth map page
 st.title("Choropleth Map")
 st.markdown("""
@@ -26,6 +19,23 @@ metric = st.selectbox(
     options=["matches", "wins", "draws"],
     index=0
 )
+
+# Aggregate matches, wins, and draws by country
+country_metrics = results_df.copy()
+country_metrics['country'] = country_metrics['home_team']  # Assuming country data is in 'home_team'
+
+country_metrics['win'] = country_metrics.apply(
+    lambda row: 1 if row['outcome'] in [row['home_team'], row['away_team']] else 0, axis=1
+)
+country_metrics['draw'] = country_metrics.apply(
+    lambda row: 1 if row['outcome'] == 'Draw' else 0, axis=1
+)
+
+country_metrics = country_metrics.groupby('country').agg(
+    matches=('date', 'count'),
+    wins=('win', 'sum'),
+    draws=('draw', 'sum')
+).reset_index()
 
 # Generate the choropleth map based on the selected metric
 fig = px.choropleth(
