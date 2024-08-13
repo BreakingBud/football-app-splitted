@@ -9,8 +9,9 @@ goalscorers_df, results_df, shootouts_df = load_data()
 def show_player_analysis():
     st.title("Player-to-Player Analysis")
     st.markdown("""
-    ### Compare performance between two players
-    Select players from the dropdown menus to see a side-by-side comparison of their performance over time.
+    ### Compare Performance Between Two Players
+
+    Select players from the dropdown menus to see a side-by-side comparison of their goal-scoring performance over time.
     """)
 
     # Use 'scorer' instead of 'player' and allow selection from the list
@@ -53,27 +54,6 @@ def show_player_analysis():
 
         fig3 = px.bar(goals_data, x='Player', y='Total Goals', title='Total Goals Comparison')
         st.plotly_chart(fig3, use_container_width=True)
-
-        # Calculate total matches involving each player by checking their team's participation
-        player1_team = player1_data['team'].iloc[0]
-        player2_team = player2_data['team'].iloc[0]
-        
-        total_matches_player1 = results_df[
-            (results_df['home_team'] == player1_team) | (results_df['away_team'] == player1_team)
-        ].shape[0]
-        
-        total_matches_player2 = results_df[
-            (results_df['home_team'] == player2_team) | (results_df['away_team'] == player2_team)
-        ].shape[0]
-
-        # Display total matches using a bar chart
-        matches_data = pd.DataFrame({
-            'Player': [player1, player2],
-            'Total Matches': [total_matches_player1, total_matches_player2]
-        })
-
-        fig4 = px.bar(matches_data, x='Player', y='Total Matches', title='Total Matches Comparison')
-        st.plotly_chart(fig4, use_container_width=True)
 
     else:
         st.warning("No data available for the selected players.")
