@@ -13,9 +13,10 @@ def show_player_analysis():
     Select players from the dropdown menus to see a side-by-side comparison of their performance over time.
     """)
 
-    # Use 'scorer' instead of 'player'
-    player1 = st.selectbox('Select Player 1', goalscorers_df['scorer'].unique())
-    player2 = st.selectbox('Select Player 2', goalscorers_df['scorer'].unique())
+    # Use 'scorer' instead of 'player' and allow selection from the list
+    player_list = goalscorers_df['scorer'].unique()
+    player1 = st.selectbox('Select Player 1', options=player_list, index=0, key="player1_select")
+    player2 = st.selectbox('Select Player 2', options=player_list, index=1, key="player2_select")
 
     player1_data = goalscorers_df[goalscorers_df['scorer'] == player1]
     player2_data = goalscorers_df[goalscorers_df['scorer'] == player2]
@@ -24,16 +25,20 @@ def show_player_analysis():
     player1_data['date'] = pd.to_datetime(player1_data['date'], errors='coerce')
     player2_data['date'] = pd.to_datetime(player2_data['date'], errors='coerce')
 
-    # Line chart of goals over time
+    # Group data by year and count goals
     player1_goals = player1_data.groupby(player1_data['date'].dt.year)['scorer'].count().reset_index(name=f'{player1} Goals')
     player2_goals = player2_data.groupby(player2_data['date'].dt.year)['scorer'].count().reset_index(name=f'{player2} Goals')
 
     if not player1_goals.empty and not player2_goals.empty:
-        fig = px.line(player1_goals, x='date', y=f'{player1} Goals', title=f'{player1} Goals Over Time')
-        st.plotly_chart(fig, use_container_width=True)
+        col1, col2 = st.columns(2)
+
+        with col1:
+            fig = px.line(player1_goals, x='date', y=f'{player1} Goals', title=f'{player1} Goals Over Time')
+            st.plotly_chart(fig, use_container_width=True)
         
-        fig2 = px.line(player2_goals, x='date', y=f'{player2} Goals', title=f'{player2} Goals Over Time')
-        st.plotly_chart(fig2, use_container_width=True)
+        with col2:
+            fig2 = px.line(player2_goals, x='date', y=f'{player2} Goals', title=f'{player2} Goals Over Time')
+            st.plotly_chart(fig2, use_container_width=True)
 
         # Bar chart for total goals comparison
         player_comparison = pd.DataFrame({
