@@ -30,6 +30,7 @@ def show_player_analysis():
         filtered_results_df = results_df[results_df['tournament'] == selected_tournament]
         filtered_goalscorers_df = filtered_goalscorers_df[filtered_goalscorers_df['team'].isin(filtered_results_df['home_team']) | filtered_goalscorers_df['team'].isin(filtered_results_df['away_team'])]
 
+    # Filter data by player again after tournament selection
     player1_data = filtered_goalscorers_df[filtered_goalscorers_df['scorer'] == player1]
     player2_data = filtered_goalscorers_df[filtered_goalscorers_df['scorer'] == player2]
 
@@ -52,10 +53,13 @@ def show_player_analysis():
             fig2 = px.line(player2_goals, x='date', y=f'{player2} Goals', title=f'{player2} Goals Over Time')
             st.plotly_chart(fig2, use_container_width=True)
 
-        # Bar chart for total goals comparison
+        # Bar chart for total goals comparison, filtered by tournament
         player_comparison = pd.DataFrame({
             'Player': [player1, player2],
-            'Total Goals': [player1_goals[f'{player1} Goals'].sum(), player2_goals[f'{player2} Goals'].sum()]
+            'Total Goals': [
+                player1_goals[f'{player1} Goals'].sum(),
+                player2_goals[f'{player2} Goals'].sum()
+            ]
         })
 
         fig3 = px.bar(player_comparison, x='Player', y='Total Goals', title='Total Goals Comparison')
