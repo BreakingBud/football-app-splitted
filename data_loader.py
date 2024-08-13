@@ -35,4 +35,11 @@ def load_data():
     )
     merged_df['shootout'] = merged_df['winner'].notna()
 
-    return goalscorers_df, merged_df, shootouts_df
+    # Aggregate matches, wins, and draws by country
+    country_metrics = merged_df.groupby('country').agg(
+        matches=('date', 'count'),
+        wins=('outcome', lambda x: ((x == merged_df.loc[x.index, 'home_team']) | (x == merged_df.loc[x.index, 'away_team'])).sum()),
+        draws=('outcome', lambda x: (x == 'Draw').sum())
+    ).reset_index()
+
+    return goalscorers_df, merged_df, shootouts_df, country_metrics
