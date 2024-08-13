@@ -31,7 +31,7 @@ def show_head_to_head():
     )
 
     # Filter the data based on user input
-    head_to_head_df = results_df[
+    head_to_head_df = results_df.loc[
         (((results_df['home_team'] == team1) & (results_df['away_team'] == team2)) |
         ((results_df['home_team'] == team2) & (results_df['away_team'] == team1))) &
         (results_df['tournament'].str.contains(tournament, case=False, na=False)) &
@@ -43,7 +43,8 @@ def show_head_to_head():
     
     if total_matches > 0:
         # Pie Chart for Win Rate
-        head_to_head_df['outcome_label'] = head_to_head_df['outcome'].apply(
+        head_to_head_df = head_to_head_df.copy()  # Avoid SettingWithCopyWarning
+        head_to_head_df.loc[:, 'outcome_label'] = head_to_head_df['outcome'].apply(
             lambda x: f'{team1} Win' if x == team1 else f'{team2} Win' if x == team2 else 'Draw'
         )
         outcome_counts = head_to_head_df['outcome_label'].value_counts()
