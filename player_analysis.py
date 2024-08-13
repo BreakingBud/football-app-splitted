@@ -20,12 +20,12 @@ def show_player_analysis():
     player2 = st.selectbox('Select Player 2', options=player_list, index=1, key="player2_select")
 
     # Filter data based on selected players
-    player1_data = goalscorers_df[goalscorers_df['scorer'] == player1]
-    player2_data = goalscorers_df[goalscorers_df['scorer'] == player2]
+    player1_data = goalscorers_df.loc[goalscorers_df['scorer'] == player1].copy()
+    player2_data = goalscorers_df.loc[goalscorers_df['scorer'] == player2].copy()
 
     # Ensure 'date' is in datetime format
-    player1_data['date'] = pd.to_datetime(player1_data['date'], errors='coerce')
-    player2_data['date'] = pd.to_datetime(player2_data['date'], errors='coerce')
+    player1_data.loc[:, 'date'] = pd.to_datetime(player1_data['date'], errors='coerce')
+    player2_data.loc[:, 'date'] = pd.to_datetime(player2_data['date'], errors='coerce')
 
     # Group data by year and count goals
     player1_goals = player1_data.groupby(player1_data['date'].dt.year)['scorer'].count().reset_index(name=f'{player1} Goals')
