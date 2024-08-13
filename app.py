@@ -13,7 +13,8 @@ pages = {
     "Introduction": "introduction",
     "Head-to-Head Analysis": "head_to_head",
     "Player-to-Player Analysis": "player_analysis",
-    "Choropleth Map": "choropleth_map"
+    "Choropleth Map": "choropleth_map",
+    "World Cup 2026 Prediction": "predict_wc"
 }
 
 # Radio buttons for page selection
