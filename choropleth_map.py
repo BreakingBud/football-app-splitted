@@ -13,6 +13,17 @@ st.markdown("""
 Use the map below to visualize the geographic distribution of football matches based on various metrics.
 """)
 
+# Dropdown for tournament selection
+tournament = st.selectbox(
+    "Select Tournament",
+    options=["All"] + sorted(results_df['tournament'].unique().tolist()),
+    index=0
+)
+
+# Filter the data by the selected tournament
+if tournament != "All":
+    results_df = results_df[results_df['tournament'] == tournament]
+
 # Dropdown for metric selection
 metric = st.selectbox(
     "Select Metric",
@@ -49,7 +60,7 @@ fig = px.choropleth(
     color=metric,
     hover_name="country",
     color_continuous_scale="Viridis",
-    title=f"Distribution of {metric.capitalize()} by Country"
+    title=f"Distribution of {metric.capitalize()} by Country in {tournament if tournament != 'All' else 'All Tournaments'}"
 )
 
 # Adjust the layout for larger map size
