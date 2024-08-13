@@ -55,12 +55,18 @@ def show_head_to_head():
         fig2.update_yaxes(title='Match Outcome', categoryorder='array', categoryarray=[f'{team1} Win', f'{team2} Win', 'Draw'])
         st.plotly_chart(fig2, use_container_width=True)
 
-        # Histogram for Goals Scored Distribution
+        # Grouped Bar Chart for Goals Scored Distribution
         fig3 = go.Figure()
-        fig3.add_trace(go.Histogram(x=head_to_head_df['home_score'], name=f'{team1} Goals'))
-        fig3.add_trace(go.Histogram(x=head_to_head_df['away_score'], name=f'{team2} Goals'))
-        fig3.update_layout(barmode='overlay', title='Goals Scored Distribution', xaxis_title='Goals', yaxis_title='Count')
-        fig3.update_traces(opacity=0.75)
+        fig3.add_trace(go.Histogram(x=head_to_head_df['home_score'], name=f'{team1} Goals', marker_color='blue', opacity=0.75))
+        fig3.add_trace(go.Histogram(x=head_to_head_df['away_score'], name=f'{team2} Goals', marker_color='orange', opacity=0.75))
+
+        fig3.update_layout(
+            barmode='group',  # Use group mode instead of overlay
+            title='Goals Scored Distribution',
+            xaxis_title='Goals',
+            yaxis_title='Count'
+        )
+
         st.plotly_chart(fig3, use_container_width=True)
 
         # Display Shootout Data if available
