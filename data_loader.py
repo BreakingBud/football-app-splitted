@@ -28,6 +28,7 @@ def load_data():
         axis=1
     )
 
+    # Merge shootouts data to results
     merged_df = results_df.merge(
         shootouts_df[['date', 'home_team', 'away_team', 'winner']],
         on=['date', 'home_team', 'away_team'], 
@@ -35,4 +36,12 @@ def load_data():
     )
     merged_df['shootout'] = merged_df['winner'].notna()
 
-    return goalscorers_df, merged_df, shootouts_df
+    # Prepare data for Choropleth Map
+    # Aggregate matches, wins, and draws by country
+    country_metrics = merged_df.groupby('country').agg(
+        matches=('date', 'count'),
+        wins=('outcome', lambda x: (x == merged_df['home_team']).sum() + (x == merged_df['away_team']).sum()),
+        draws=('outcome', lambda x: (x == 'Draw').sum())
+    ).reset_index()
+
+    return goalscorers_df, merged_df, shootouts_df, country_metrics
