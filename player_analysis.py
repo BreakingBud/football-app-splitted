@@ -18,19 +18,19 @@ def show_player_analysis():
     player1 = st.selectbox('Select Player 1', options=player_list, index=0, key="player1_select")
     player2 = st.selectbox('Select Player 2', options=player_list, index=1, key="player2_select")
 
-    # Filter data based on selected players
-    filtered_goalscorers_df = goalscorers_df[(goalscorers_df['scorer'] == player1) | (goalscorers_df['scorer'] == player2)].copy()
-
     # Select tournament after selecting players
     tournaments = results_df['tournament'].unique()
     selected_tournament = st.selectbox('Select Tournament', ['All'] + sorted(tournaments.tolist()))
 
+    # Filter data based on selected players
+    filtered_goalscorers_df = goalscorers_df.loc[(goalscorers_df['scorer'] == player1) | (goalscorers_df['scorer'] == player2)].copy()
+
     # Further filter data based on selected tournament
     if selected_tournament != 'All':
-        filtered_results_df = results_df[results_df['tournament'] == selected_tournament]
-        filtered_goalscorers_df = filtered_goalscorers_df[
-            filtered_goalscorers_df['team'].isin(filtered_results_df['home_team']) |
-            filtered_goalscorers_df['team'].isin(filtered_results_df['away_team'])
+        filtered_results_df = results_df.loc[results_df['tournament'] == selected_tournament]
+        filtered_goalscorers_df = filtered_goalscorers_df.loc[
+            (filtered_goalscorers_df['team'].isin(filtered_results_df['home_team'])) |
+            (filtered_goalscorers_df['team'].isin(filtered_results_df['away_team']))
         ]
 
     player1_data = filtered_goalscorers_df.loc[filtered_goalscorers_df['scorer'] == player1]
