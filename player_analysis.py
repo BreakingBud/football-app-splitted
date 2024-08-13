@@ -36,17 +36,32 @@ def show_player_analysis():
         col1, col2 = st.columns(2)
 
         with col1:
-            fig1 = px.pie(player1_goals, names='date', values=f'{player1} Goals', title=f'{player1} Goals Over Time')
+            fig1 = px.line(player1_goals, x='date', y=f'{player1} Goals', title=f'{player1} Goals Over Time')
             st.plotly_chart(fig1, use_container_width=True)
         
         with col2:
-            fig2 = px.pie(player2_goals, names='date', values=f'{player2} Goals', title=f'{player2} Goals Over Time')
+            fig2 = px.line(player2_goals, x='date', y=f'{player2} Goals', title=f'{player2} Goals Over Time')
             st.plotly_chart(fig2, use_container_width=True)
+
+        # Small bar chart for total matches
+        total_matches = len(filtered_goalscorers_df)
+        st.markdown(f"**Total matches involving {player1} or {player2}:** {total_matches}")
+
+        match_counts = pd.DataFrame({
+            'Player': [player1, player2],
+            'Matches': [
+                len(player1_data),
+                len(player2_data)
+            ]
+        })
+
+        fig3 = px.bar(match_counts, x='Player', y='Matches', title='Total Matches Comparison')
+        st.plotly_chart(fig3, use_container_width=True)
 
         # Pie chart for match outcomes
         outcome_counts = filtered_goalscorers_df['outcome'].value_counts()
-        fig3 = px.pie(outcome_counts, names=outcome_counts.index, values=outcome_counts.values, title="Match Outcomes")
-        st.plotly_chart(fig3, use_container_width=True)
+        fig4 = px.pie(outcome_counts, names=outcome_counts.index, values=outcome_counts.values, title="Match Outcomes")
+        st.plotly_chart(fig4, use_container_width=True)
 
     else:
         st.warning("No data available for the selected players.")
