@@ -13,23 +13,24 @@ def show_player_analysis():
     Select players from the dropdown menus to see a side-by-side comparison of their performance over time.
     """)
 
-    # Select tournament
-    tournaments = goalscorers_df['team'].unique()
+    # Use the correct column for tournaments (replace 'tournament' with the correct column name if needed)
+    tournaments = results_df['tournament'].unique()
     selected_tournament = st.selectbox('Select Tournament', ['All'] + sorted(tournaments.tolist()))
 
     # Filter data based on tournament selection
     if selected_tournament != 'All':
-        filtered_df = goalscorers_df[goalscorers_df['team'] == selected_tournament]
+        filtered_results_df = results_df[results_df['tournament'] == selected_tournament]
+        filtered_goalscorers_df = goalscorers_df[goalscorers_df['team'].isin(filtered_results_df['home_team']) | goalscorers_df['team'].isin(filtered_results_df['away_team'])]
     else:
-        filtered_df = goalscorers_df
+        filtered_goalscorers_df = goalscorers_df
 
     # Use 'scorer' instead of 'player' and allow selection from the list
-    player_list = filtered_df['scorer'].unique()
+    player_list = filtered_goalscorers_df['scorer'].unique()
     player1 = st.selectbox('Select Player 1', options=player_list, index=0, key="player1_select")
     player2 = st.selectbox('Select Player 2', options=player_list, index=1, key="player2_select")
 
-    player1_data = filtered_df[filtered_df['scorer'] == player1]
-    player2_data = filtered_df[filtered_df['scorer'] == player2]
+    player1_data = filtered_goalscorers_df[filtered_goalscorers_df['scorer'] == player1]
+    player2_data = filtered_goalscorers_df[filtered_goalscorers_df['scorer'] == player2]
 
     # Ensure 'date' is in datetime format
     player1_data['date'] = pd.to_datetime(player1_data['date'], errors='coerce')
