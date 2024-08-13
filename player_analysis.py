@@ -19,10 +19,8 @@ def show_player_analysis():
     player2 = st.selectbox('Select Player 2', options=player_list, index=1, key="player2_select")
 
     # Filter data based on selected players
-    filtered_goalscorers_df = goalscorers_df.loc[(goalscorers_df['scorer'] == player1) | (goalscorers_df['scorer'] == player2)].copy()
-
-    player1_data = filtered_goalscorers_df.loc[filtered_goalscorers_df['scorer'] == player1]
-    player2_data = filtered_goalscorers_df.loc[filtered_goalscorers_df['scorer'] == player2]
+    player1_data = goalscorers_df[goalscorers_df['scorer'] == player1]
+    player2_data = goalscorers_df[goalscorers_df['scorer'] == player2]
 
     # Ensure 'date' is in datetime format
     player1_data['date'] = pd.to_datetime(player1_data['date'], errors='coerce')
@@ -57,18 +55,23 @@ def show_player_analysis():
         st.plotly_chart(fig3, use_container_width=True)
 
         # Calculate total matches involving each player
-        total_matches = filtered_goalscorers_df.groupby('scorer')['date'].count().reset_index(name='Total Matches')
+        total_matches_player1 = results_df[(results_df['home_team'] == player1_data['team'].unique()[0]) |
+                                           (results_df['away_team'] == player1_data['team'].unique()[0])].shape[0]
+                                           
+        total_matches_player2 = results_df[(results_df['home_team'] == player2_data['team'].unique()[0]) |
+                                           (results_df['away_team'] == player2_data['team'].unique()[0])].shape[0]
 
         # Display total matches using a bar chart
-        fig4 = px.bar(total_matches, x='scorer', y='Total Matches', title='Total Matches Involving Each Player')
+        matches_data = pd.DataFrame({
+            'Player': [player1, player2],
+            'Total Matches': [total_matches_player1, total_matches_player2]
+        })
+
+        fig4 = px.bar(matches_data, x='Player', y='Total Matches', title='Total Matches Comparison')
         st.plotly_chart(fig4, use_container_width=True)
 
-        # Pie chart for match outcomes
-        outcome_counts = results_df[(results_df['home_team'].isin([player1_data['team'].unique()[0], player2_data['team'].unique()[0]])) | 
-                                    (results_df['away_team'].isin([player1_data['team'].unique()[0], player2_data['team'].unique()[0]]))]
-        outcome_counts = outcome_counts['outcome'].value_counts()
-        fig5 = px.pie(outcome_counts, names=outcome_counts.index, values=outcome_counts.values, title="Match Outcomes")
-        st.plotly_chart(fig5, use_container_width=True)
+        # Remove irrelevant pie chart or replace it with another visualization
+        st.warning("Replace the last pie chart with a relevant visualization if needed.")
 
     else:
         st.warning("No data available for the selected players.")
