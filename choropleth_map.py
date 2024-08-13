@@ -1,5 +1,6 @@
 import streamlit as st
 import plotly.express as px
+import plotly.graph_objects as go
 from data_loader import load_data
 
 # Load the data
@@ -52,22 +53,36 @@ country_metrics = country_metrics.groupby('country').agg(
     losses=('loss', 'sum')
 ).reset_index()
 
-# Generate the choropleth map based on the selected metric
-fig = px.choropleth(
-    country_metrics,
-    locations="country",
-    locationmode="country names",
-    color=metric,
-    hover_name="country",
-    color_continuous_scale="Viridis",
-    title=f"Distribution of {metric.capitalize()} by Country in {tournament if tournament != 'All' else 'All Tournaments'}"
+# Generate the spherical choropleth map based on the selected metric
+fig = go.Figure()
+
+fig.add_trace(
+    go.Choropleth(
+        locations=country_metrics['country'],
+        z=country_metrics[metric],
+        locationmode='country names',
+        colorscale='Viridis',
+        marker_line_color='white',
+        colorbar_title=f'{metric.capitalize()}',
+    )
 )
 
-# Adjust the layout for larger map size
+# Update the layout for a spherical map with a transparent background
 fig.update_layout(
+    geo=dict(
+        projection_type='orthographic',  # Makes the map spherical
+        showcoastlines=True,
+        coastlinecolor="white",
+        showland=True,
+        landcolor="rgba(0, 0, 0, 0)",  # Transparent land color
+        showocean=True,
+        oceancolor="rgba(0, 0, 0, 0)",  # Transparent ocean color
+        bgcolor="rgba(0,0,0,0)"  # Transparent background
+    ),
     margin={"r":0,"t":50,"l":0,"b":0},
     height=600,
-    geo=dict(showcoastlines=True)
+    paper_bgcolor="rgba(0, 0, 0, 0)",  # Transparent background
+    plot_bgcolor="rgba(0, 0, 0, 0)"    # Transparent background
 )
 
 st.plotly_chart(fig, use_container_width=True)
