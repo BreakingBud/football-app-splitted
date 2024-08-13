@@ -13,21 +13,22 @@ def show_player_analysis():
     Select players from the dropdown menus to see a side-by-side comparison of their performance over time.
     """)
 
-    # Use the correct column for tournaments (replace 'tournament' with the correct column name if needed)
+    # Use 'scorer' instead of 'player' and allow selection from the list
+    player_list = goalscorers_df['scorer'].unique()
+    player1 = st.selectbox('Select Player 1', options=player_list, index=0, key="player1_select")
+    player2 = st.selectbox('Select Player 2', options=player_list, index=1, key="player2_select")
+
+    # Filter data based on selected players
+    filtered_goalscorers_df = goalscorers_df[(goalscorers_df['scorer'] == player1) | (goalscorers_df['scorer'] == player2)]
+
+    # Select tournament after selecting players
     tournaments = results_df['tournament'].unique()
     selected_tournament = st.selectbox('Select Tournament', ['All'] + sorted(tournaments.tolist()))
 
-    # Filter data based on tournament selection
+    # Further filter data based on selected tournament
     if selected_tournament != 'All':
         filtered_results_df = results_df[results_df['tournament'] == selected_tournament]
-        filtered_goalscorers_df = goalscorers_df[goalscorers_df['team'].isin(filtered_results_df['home_team']) | goalscorers_df['team'].isin(filtered_results_df['away_team'])]
-    else:
-        filtered_goalscorers_df = goalscorers_df
-
-    # Use 'scorer' instead of 'player' and allow selection from the list
-    player_list = filtered_goalscorers_df['scorer'].unique()
-    player1 = st.selectbox('Select Player 1', options=player_list, index=0, key="player1_select")
-    player2 = st.selectbox('Select Player 2', options=player_list, index=1, key="player2_select")
+        filtered_goalscorers_df = filtered_goalscorers_df[filtered_goalscorers_df['team'].isin(filtered_results_df['home_team']) | filtered_goalscorers_df['team'].isin(filtered_results_df['away_team'])]
 
     player1_data = filtered_goalscorers_df[filtered_goalscorers_df['scorer'] == player1]
     player2_data = filtered_goalscorers_df[filtered_goalscorers_df['scorer'] == player2]
@@ -60,6 +61,6 @@ def show_player_analysis():
         fig3 = px.bar(player_comparison, x='Player', y='Total Goals', title='Total Goals Comparison')
         st.plotly_chart(fig3, use_container_width=True)
     else:
-        st.warning("No data available for the selected players.")
+        st.warning("No data available for the selected players and tournament.")
 
 show_player_analysis()
