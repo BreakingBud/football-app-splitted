@@ -27,4 +27,7 @@ def load_and_preprocess_data(zip_file_path, extract_path):
     return goalscorers_df, results_df, shootouts_df
 
 # Usage example:
-# load_and_preprocess_data('football_data_matches_scorers_shootouts.zip', '/tmp/extracted_data')
+# goalscorers_df, results_df, shootouts_df = load_and_preprocess_data(
+#     'football_data_matches_scorers_shootouts.zip', 
+#     '/tmp/extracted_data'
+# )
