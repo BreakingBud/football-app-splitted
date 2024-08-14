@@ -2,7 +2,6 @@ import streamlit as st
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 from preprocess import load_and_preprocess_data
-from model import create_model
 
 # Load and preprocess data
 zip_file_path = 'football_data_matches_scorers_shootouts.zip'
@@ -35,56 +34,8 @@ if len(teams) == 16:
         (teams[6], teams[9]), (teams[1], teams[14])
     ]
 
-    # Predict winners for each match
-    winners = []
-    for match in matches:
-        home_team_encoded = team_encoder.transform([match[0]])[0]
-        away_team_encoded = team_encoder.transform([match[1]])[0]
-        input_data = np.array([[home_team_encoded, away_team_encoded]])
-        input_data = scaler.transform(input_data)
-        
-        model = create_model(input_dim=input_data.shape[1])
-        model.load_weights("path_to_your_trained_model.h5")  # Replace with actual path
-        prediction = model.predict(input_data)
-        
-        winner = match[0] if prediction[0][0] > 0.5 else match[1]
-        winners.append(winner)
-
-    # Predict subsequent rounds
-    quarterfinals = [(winners[i], winners[i+1]) for i in range(0, len(winners), 2)]
-    winners_quarterfinals = []
-    for match in quarterfinals:
-        home_team_encoded = team_encoder.transform([match[0]])[0]
-        away_team_encoded = team_encoder.transform([match[1]])[0]
-        input_data = np.array([[home_team_encoded, away_team_encoded]])
-        input_data = scaler.transform(input_data)
-        
-        prediction = model.predict(input_data)
-        
-        winner = match[0] if prediction[0][0] > 0.5 else match[1]
-        winners_quarterfinals.append(winner)
-
-    semifinals = [(winners_quarterfinals[0], winners_quarterfinals[1]), (winners_quarterfinals[2], winners_quarterfinals[3])]
-    winners_semifinals = []
-    for match in semifinals:
-        home_team_encoded = team_encoder.transform([match[0]])[0]
-        away_team_encoded = team_encoder.transform([match[1]])[0]
-        input_data = np.array([[home_team_encoded, away_team_encoded]])
-        input_data = scaler.transform(input_data)
-        
-        prediction = model.predict(input_data)
-        
-        winner = match[0] if prediction[0][0] > 0.5 else match[1]
-        winners_semifinals.append(winner)
-
-    final = (winners_semifinals[0], winners_semifinals[1])
-    home_team_encoded = team_encoder.transform([final[0]])[0]
-    away_team_encoded = team_encoder.transform([final[1]])[0]
-    input_data = np.array([[home_team_encoded, away_team_encoded]])
-    input_data = scaler.transform(input_data)
-
-    prediction = model.predict(input_data)
-    final_winner = final[0] if prediction[0][0] > 0.5 else final[1]
+    # Placeholder for winners (normally this would be done with predictions)
+    winners = [match[0] for match in matches]  # Placeholder: always choose the first team
 
     # Draw the bracket programmatically
     image = Image.new('RGB', (1000, 1000), (255, 255, 255))
@@ -105,11 +56,6 @@ if len(teams) == 16:
 
     for i, winner in enumerate(winners):
         draw.text(positions[8+i], winner, font=font, fill="black")
-
-    for i, winner in enumerate(winners_quarterfinals):
-        draw.text(positions[12+i], winner, font=font, fill="black")
-
-    draw.text(positions[14], final_winner, font=font, fill="black")
 
     # Display the filled bracket image
     st.image(image, caption="World Cup Knockout Predictions", use_column_width=True)
