@@ -6,7 +6,6 @@ def show_page():
     st.title("Football Analysis App")
     st.markdown("""
     Welcome to the Football Analysis App! Explore detailed statistics and insights about teams and players.
-    Please select your preferred color theme from the options below and navigate through the app using the menu.
     """)
 
     # Horizontal color theme selection
