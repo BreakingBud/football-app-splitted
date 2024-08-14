@@ -1,61 +1,78 @@
 import streamlit as st
-import numpy as np
 from PIL import Image, ImageDraw, ImageFont
-from preprocess import load_and_preprocess_data
 
-# Load and preprocess data
-zip_file_path = 'football_data_matches_scorers_shootouts.zip'
-extract_path = '/tmp/extracted_data'
-results_df, label_encoders, scaler, team_encoder = load_and_preprocess_data(zip_file_path, extract_path)
+# Initialize Streamlit app
+st.title("FIFA World Cup Knockout Stage Bracket")
 
-st.title("FIFA World Cup Knockout Stage Prediction")
+# Draw the bracket programmatically
+image_width, image_height = 800, 600
+image = Image.new('RGB', (image_width, image_height), (255, 255, 255))
+draw = ImageDraw.Draw(image)
+font = ImageFont.load_default()
 
-# Get the original team names before encoding
-team_names = team_encoder.classes_
+# Draw the lines for the bracket
+# Define some coordinates for where the lines should be drawn
+line_coords = [
+    # Round of 16
+    (100, 50, 300, 50), (100, 150, 300, 150),
+    (100, 250, 300, 250), (100, 350, 300, 350),
+    (100, 450, 300, 450), (100, 550, 300, 550),
+    (100, 650, 300, 650), (100, 750, 300, 750),
 
-# Get top 16 teams by goals scored
-top_teams = results_df.groupby('home_team')['home_score'].sum().sort_values(ascending=False).head(16).index.tolist()
-top_teams = [team_encoder.inverse_transform([team])[0] for team in top_teams]
+    # Quarter-finals
+    (300, 100, 500, 100), (300, 300, 500, 300),
+    (300, 500, 500, 500), (300, 700, 500, 700),
 
-# User inputs for the 16 teams
-st.subheader("Select the 16 teams that qualified for the knockout stage")
-teams = []
-for i in range(16):
-    team = st.selectbox(f"Team {i+1}", options=team_names, index=team_names.tolist().index(top_teams[i]), key=f"team_{i}")
-    teams.append(team)
+    # Semi-finals
+    (500, 200, 700, 200), (500, 600, 700, 600),
 
-# Ensure 16 teams are selected
-if len(teams) == 16:
-    # Define initial match pairings based on the bracket structure
-    matches = [
-        (teams[0], teams[15]), (teams[7], teams[8]),
-        (teams[4], teams[11]), (teams[3], teams[12]),
-        (teams[2], teams[13]), (teams[5], teams[10]),
-        (teams[6], teams[9]), (teams[1], teams[14])
-    ]
+    # Final
+    (700, 400, 900, 400),
+]
 
-    # Placeholder for winners (normally this would be done with predictions)
-    winners = [match[0] for match in matches]  # Placeholder: always choose the first team
+# Draw the lines on the image
+for coords in line_coords:
+    draw.line(coords, fill="black", width=5)
 
-    # Draw the bracket programmatically
-    image = Image.new('RGB', (1000, 1000), (255, 255, 255))
-    draw = ImageDraw.Draw(image)
-    font = ImageFont.load_default()  # Use default PIL font
+# Draw the team slots (text placeholders)
+team_slots = [
+    (50, 45), (50, 145), (50, 245), (50, 345),
+    (50, 445), (50, 545), (50, 645), (50, 745),
 
-    # Define positions for the text
-    positions = [
-        (50, 150), (50, 250), (50, 350), (50, 450),
-        (50, 550), (50, 650), (50, 750), (50, 850),
-        (200, 200), (200, 400), (200, 600), (200, 800),
-        (350, 300), (350, 700), (500, 500)
-    ]
+    (350, 95), (350, 295), (350, 495), (350, 695),
 
-    # Draw the team names and winners on the image
-    for i, team in enumerate(teams):
-        draw.text(positions[i], team, font=font, fill="black")
+    (550, 195), (550, 595),
 
-    for i, winner in enumerate(winners):
-        draw.text(positions[8+i], winner, font=font, fill="black")
+    (750, 395)
+]
 
-    # Display the filled bracket image
-    st.image(image, caption="World Cup Knockout Predictions", use_column_width=True)
+# Placeholder group names
+groups = [
+    "Group A Winner", "Group B Runner-Up", 
+    "Group C Winner", "Group D Runner-Up", 
+    "Group E Winner", "Group F Runner-Up", 
+    "Group G Winner", "Group H Runner-Up",
+    "Group B Winner", "Group A Runner-Up",
+    "Group D Winner", "Group C Runner-Up",
+    "Group F Winner", "Group E Runner-Up",
+    "Group H Winner", "Group G Runner-Up"
+]
+
+# Assign group names to corresponding slots in the bracket
+group_matchup_order = [
+    "Group A Winner", "Group B Runner-Up",
+    "Group C Winner", "Group D Runner-Up",
+    "Group E Winner", "Group F Runner-Up",
+    "Group G Winner", "Group H Runner-Up",
+    "Group B Winner", "Group A Runner-Up",
+    "Group D Winner", "Group C Runner-Up",
+    "Group F Winner", "Group E Runner-Up",
+    "Group H Winner", "Group G Runner-Up"
+]
+
+# Draw the group names on the image
+for position, group in zip(team_slots, group_matchup_order):
+    draw.text(position, group, fill="black", font=font)
+
+# Display the bracket
+st.image(image, caption="Knockout Stage Bracket", use_column_width=True)
