@@ -4,14 +4,14 @@ import plotly.express as px
 import plotly.graph_objects as go
 
 def get_color_theme(theme):
-    if theme == "Good Palette":
-        return px.colors.qualitative.Plotly
-    elif theme == "Single Color":
-        return ["#1f77b4"]  # A single color palette
+    if theme == "Primary":
+        return px.colors.qualitative.Set3  # Example of a good palette
+    elif theme == "Single Color (Blue)":
+        return ["#1f77b4"]  # Monochromatic blue palette
     elif theme == "Viridis":
         return px.colors.sequential.Viridis
     else:
-        return px.colors.qualitative.Plotly  # Default fallback
+        return px.colors.qualitative.Set3  # Default fallback
 
 def show_page(results_df):
     st.title("Head-to-Head Analysis")
@@ -71,7 +71,6 @@ def show_page(results_df):
         display_match_details_table(head_to_head_df)
 
 def filter_head_to_head_data(df, team1, team2, tournament, start_date, end_date):
-    # Filter data based on selected teams, tournament, and date range
     return df.loc[
         (((df['home_team'] == team1) & (df['away_team'] == team2)) |
         ((df['home_team'] == team2) & (df['away_team'] == team1))) &
