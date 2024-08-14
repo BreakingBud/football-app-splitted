@@ -1,12 +1,16 @@
 import streamlit as st
-import pandas as pd  # Ensure pandas is imported
+import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from data_loader import load_data
 from helpers import get_color_theme
 
-# Load the data
-goalscorers_df, results_df, shootouts_df = load_data()
+# Attempt to load the data
+try:
+    goalscorers_df, results_df, shootouts_df = load_data()
+except Exception as e:
+    st.error(f"Error loading data: {e}")
+    st.stop()
 
 def show_page():
     st.title("Head-to-Head Analysis")
