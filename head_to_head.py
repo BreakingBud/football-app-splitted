@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-def show_page(results_df):
+def show_page(results_df=None):
     st.title("Head-to-Head Analysis")
     st.markdown("""
     ### Compare the Performance of Two Teams
