@@ -10,9 +10,14 @@ def show_page():
 
     # Horizontal color theme selection with smaller palette preview
     st.markdown("### Choose your color theme:")
+    
+    # Define the available color themes
+    color_palettes = ["Primary", "Single Color", "Diverging"]
+
+    # Display radio buttons for selecting a color theme
     selected_palette = st.radio(
         label="",
-        options=list(get_color_theme(None).keys()),
+        options=color_palettes,
         horizontal=True
     )
 
@@ -21,8 +26,9 @@ def show_page():
 
     # Display selected color palette in a small, subtle way
     st.markdown("### Selected Color Palette:")
-    cols = st.columns(len(get_color_theme(selected_palette)))
-    for idx, color in enumerate(get_color_theme(selected_palette)):
+    color_theme = get_color_theme(selected_palette)
+    cols = st.columns(len(color_theme))
+    for idx, color in enumerate(color_theme):
         cols[idx].markdown(f'<div style="background-color: {color}; height: 20px; width: 20px; border-radius: 50%;"></div>', unsafe_allow_html=True)
 
     # Display a Lottie animation at the bottom right corner
@@ -37,3 +43,4 @@ def show_page():
     You can compare teams head-to-head, analyze individual match statistics, and review team performance.
     Use the sidebar to navigate between different analysis pages.
     """)
+
