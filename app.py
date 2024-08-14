@@ -21,14 +21,25 @@ pages = {
     "Choropleth Map": "choropleth_map"
 }
 
+# Define color palettes
+color_palettes = {
+    "Primary": ["#4285F4", "#EA4335", "#FBBC05", "#34A853"],  # Google colors
+    "Single Color (Blue)": ["#1f77b4"],  # Monochromatic blue palette
+    "Viridis": px.colors.sequential.Viridis
+}
+
 # Theme selection
 theme = st.sidebar.selectbox(
     "Choose your color theme",
-    ["Primary", "Single Color (Blue)", "Viridis"]
+    list(color_palettes.keys())
 )
 
 # Store the theme selection in session state
 st.session_state['theme'] = theme
+
+# Display the selected color palette
+st.sidebar.markdown("### Selected Color Palette")
+st.sidebar.write(color_palettes[theme])
 
 # Radio buttons for page selection
 selected_page = st.sidebar.radio("Go to", list(pages.keys()))
@@ -38,10 +49,10 @@ module = importlib.import_module(pages[selected_page])
 
 # Pass the relevant data to each page
 if selected_page == "Head-to-Head Analysis":
-    module.show_page(results_df)
+    module.show_page(results_df, color_palettes)
 elif selected_page == "Player-to-Player Analysis":
-    module.show_page(goalscorers_df)
+    module.show_page(goalscorers_df, color_palettes)
 elif selected_page == "Choropleth Map":
-    module.show_page(results_df)
+    module.show_page(results_df, color_palettes)
 else:
     module.show_page()
