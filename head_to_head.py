@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-def show_page(results_df=None):
+def show_page(results_df):
     st.title("Head-to-Head Analysis")
     st.markdown("""
     ### Compare the Performance of Two Teams
@@ -26,6 +26,7 @@ def show_page(results_df=None):
     if tournament != "All":
         filtered_df = filtered_df[filtered_df['tournament'] == tournament]
 
+    # Display message if no matches are found
     if filtered_df.empty:
         st.warning("No matches found between the selected teams in the selected tournament.")
         return
