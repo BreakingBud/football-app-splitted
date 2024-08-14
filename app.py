@@ -2,7 +2,7 @@ import streamlit as st
 import importlib
 from data_loader import load_data
 
-# Set up the app configuration at the start of the script
+# Set up the app configuration
 st.set_page_config(
     page_title="Football Analysis App",
     layout="wide",
@@ -12,7 +12,7 @@ st.set_page_config(
 # Load data
 goalscorers_df, results_df, shootouts_df = load_data()
 
-# Sidebar for navigation
+# Sidebar for navigation and theme selection
 st.sidebar.title("Navigation")
 pages = {
     "Introduction": "introduction",
@@ -20,6 +20,15 @@ pages = {
     "Player-to-Player Analysis": "player_analysis",
     "Choropleth Map": "choropleth_map"
 }
+
+# Theme selection
+theme = st.sidebar.selectbox(
+    "Choose your color theme",
+    ["Primary", "Single Color (Blue)", "Viridis"]
+)
+
+# Store the theme selection in session state
+st.session_state['theme'] = theme
 
 # Radio buttons for page selection
 selected_page = st.sidebar.radio("Go to", list(pages.keys()))
