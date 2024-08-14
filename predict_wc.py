@@ -1,78 +1,32 @@
-import streamlit as st
-from PIL import Image, ImageDraw, ImageFont
+import pandas as pd
+from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.model_selection import train_test_split
 
-# Initialize Streamlit app
-st.title("FIFA World Cup Knockout Stage Bracket")
+def load_and_preprocess_data(zip_file_path, extract_path):
+    # Load data from the provided CSV files within the zip archive
+    goalscorers_df = pd.read_csv(f'{extract_path}/goalscorers.csv')
+    results_df = pd.read_csv(f'{extract_path}/results.csv')
+    shootouts_df = pd.read_csv(f'{extract_path}/shootouts.csv')
 
-# Draw the bracket programmatically
-image_width, image_height = 800, 600
-image = Image.new('RGB', (image_width, image_height), (255, 255, 255))
-draw = ImageDraw.Draw(image)
-font = ImageFont.load_default()
+    # Encode categorical variables
+    label_encoders = {}
+    categorical_columns = ['home_team', 'away_team', 'tournament', 'country', 'city']
+    for col in categorical_columns:
+        le = LabelEncoder()
+        results_df[col] = le.fit_transform(results_df[col])
+        label_encoders[col] = le
 
-# Draw the lines for the bracket
-# Define some coordinates for where the lines should be drawn
-line_coords = [
-    # Round of 16
-    (100, 50, 300, 50), (100, 150, 300, 150),
-    (100, 250, 300, 250), (100, 350, 300, 350),
-    (100, 450, 300, 450), (100, 550, 300, 550),
-    (100, 650, 300, 650), (100, 750, 300, 750),
+    # Scale numeric variables
+    scaler = StandardScaler()
+    numeric_columns = ['home_score', 'away_score', 'home_possession', 'away_possession']
+    results_df[numeric_columns] = scaler.fit_transform(results_df[numeric_columns])
 
-    # Quarter-finals
-    (300, 100, 500, 100), (300, 300, 500, 300),
-    (300, 500, 500, 500), (300, 700, 500, 700),
+    # Define features and target variable
+    X = results_df[['home_team', 'away_team', 'home_score', 'away_score', 'tournament']]
+    y = (results_df['home_score'] > results_df['away_score']).astype(int)  # 1 if home team wins, 0 otherwise
 
-    # Semi-finals
-    (500, 200, 700, 200), (500, 600, 700, 600),
+    # Split the data into training and test sets
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    # Final
-    (700, 400, 900, 400),
-]
+    return X_train, X_test, y_train, y_test, label_encoders, scaler, label_encoders['home_team']
 
-# Draw the lines on the image
-for coords in line_coords:
-    draw.line(coords, fill="black", width=5)
-
-# Draw the team slots (text placeholders)
-team_slots = [
-    (50, 45), (50, 145), (50, 245), (50, 345),
-    (50, 445), (50, 545), (50, 645), (50, 745),
-
-    (350, 95), (350, 295), (350, 495), (350, 695),
-
-    (550, 195), (550, 595),
-
-    (750, 395)
-]
-
-# Placeholder group names
-groups = [
-    "Group A Winner", "Group B Runner-Up", 
-    "Group C Winner", "Group D Runner-Up", 
-    "Group E Winner", "Group F Runner-Up", 
-    "Group G Winner", "Group H Runner-Up",
-    "Group B Winner", "Group A Runner-Up",
-    "Group D Winner", "Group C Runner-Up",
-    "Group F Winner", "Group E Runner-Up",
-    "Group H Winner", "Group G Runner-Up"
-]
-
-# Assign group names to corresponding slots in the bracket
-group_matchup_order = [
-    "Group A Winner", "Group B Runner-Up",
-    "Group C Winner", "Group D Runner-Up",
-    "Group E Winner", "Group F Runner-Up",
-    "Group G Winner", "Group H Runner-Up",
-    "Group B Winner", "Group A Runner-Up",
-    "Group D Winner", "Group C Runner-Up",
-    "Group F Winner", "Group E Runner-Up",
-    "Group H Winner", "Group G Runner-Up"
-]
-
-# Draw the group names on the image
-for position, group in zip(team_slots, group_matchup_order):
-    draw.text(position, group, fill="black", font=font)
-
-# Display the bracket
-st.image(image, caption="Knockout Stage Bracket", use_column_width=True)
