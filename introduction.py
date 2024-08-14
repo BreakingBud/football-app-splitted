@@ -25,7 +25,6 @@ def show_page():
     st.session_state['theme'] = selected_palette
 
     # Display selected color palette in a small, subtle way
-    st.markdown("### Selected Color Palette:")
     color_theme = get_color_theme(selected_palette)
     st.markdown(
         "".join(
