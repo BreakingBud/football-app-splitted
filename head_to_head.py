@@ -8,7 +8,14 @@ goalscorers_df, results_df, shootouts_df = load_data()
 
 def show_page():
     st.title("Head-to-Head Analysis")
-    st.markdown("Compare the performance of two teams across various matches. Use the filters to customize your analysis.")
+    st.markdown("""
+    Compare the performance of two teams across various matches. Use the filters to customize your analysis.
+    """)
+
+    # Check if results_df is loaded and not empty
+    if results_df is None or results_df.empty:
+        st.error("Data could not be loaded or is empty. Please check the data source and try again.")
+        return
 
     # Ensure the 'date' column is in datetime format and clean the data
     results_df['date'] = pd.to_datetime(results_df['date'], errors='coerce')
