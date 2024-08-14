@@ -2,57 +2,63 @@ import streamlit as st
 from streamlit_lottie import st_lottie
 import requests
 
-# Function to load Lottie animation
+# Function to load Lottie animation from URL
 def load_lottie_url(url: str):
-    try:
-        response = requests.get(url)
-        if response.status_code == 200:
-            return response.json()
-        else:
-            st.error("Lottie animation not found.")
-            return None
-    except requests.RequestException as e:
-        st.error(f"Request error: {e}")
+    response = requests.get(url)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        st.error("Lottie animation not found.")
         return None
 
 def show_page():
     st.title("Football Analysis App")
     st.markdown("""
     Welcome to the Football Analysis App! Explore detailed statistics and insights about football matches.
-
     Please select your preferred color theme from the sidebar and navigate through the app using the menu.
     """)
 
-    # Color theme selection
-    theme = st.sidebar.selectbox(
-        "Choose your color theme",
-        ["Primary Color", "Single Color", "Diverging"]
-    )
-
-    # Store the theme selection in session state
-    st.session_state['theme'] = theme
-
-    # Display a Lottie animation
-    lottie_url = "https://assets5.lottiefiles.com/packages/lf20_YXD37q.json"
-    lottie_data = load_lottie_url(lottie_url)
-    if lottie_data:
-        st_lottie(lottie_data, height=300, key="intro_lottie")
-
-    # Display color palettes in the sidebar
-    st.sidebar.title("Color Palette Preview")
+    # Color theme selection displayed horizontally
+    st.markdown("### Choose your color theme:")
+    
     color_palettes = {
-        "Primary Color": ["#4285F4", "#34A853", "#FBBC05", "#EA4335"],
+        "Primary": ["#4285F4", "#34A853", "#FBBC05", "#EA4335"],
         "Single Color": ["#009688", "#00796B", "#004D40", "#00251A"],
         "Diverging": ["#E69F00", "#56B4E9", "#009E73", "#F0E442"]
     }
-    
-    def display_palette_preview(colors):
-        for color in colors:
-            st.sidebar.markdown(f'<div style="background-color: {color}; width: 30px; height: 30px; margin: 2px;"></div>', unsafe_allow_html=True)
 
-    if theme in color_palettes:
-        display_palette_preview(color_palettes[theme])
+    selected_palette = st.radio(
+        label="",
+        options=list(color_palettes.keys()),
+        horizontal=True
+    )
 
-    st.markdown("### About the App")
-    st.markdown("Use the sidebar to navigate between pages and analyze different football match statistics.")
+    # Store the theme selection in session state
+    st.session_state['theme'] = selected_palette
+
+    # Display selected color palette
+    st.markdown("### Selected Color Palette:")
+    cols = st.columns(len(color_palettes[selected_palette]))
+    for idx, color in enumerate(color_palettes[selected_palette]):
+        cols[idx].markdown(f'<div style="background-color: {color}; height: 50px;"></div>', unsafe_allow_html=True)
+
+    # Display a Lottie animation at the bottom right corner
+    lottie_url = "https://assets5.lottiefiles.com/packages/lf20_YXD37q.json"
+    lottie_data = load_lottie_url(lottie_url)
+    if lottie_data:
+        st.markdown(
+            f"""
+            <div style="position: fixed; bottom: 0px; right: 0px;">
+                {st_lottie(lottie_data, height=150, key="intro_lottie")}
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    # Display a brief description of the app
+    st.markdown("""
+    This application provides an in-depth analysis of football matches. 
+    You can compare teams head-to-head, analyze individual match statistics, and review team performance.
+    Use the sidebar to navigate between different analysis pages.
+    """)
 
