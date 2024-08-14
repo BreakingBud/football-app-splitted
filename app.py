@@ -22,14 +22,29 @@ pages = {
     "Choropleth Map": "choropleth_map"
 }
 
-# Theme selection
+# Color palette options
+color_palettes = {
+    "Primary": ["#4285F4", "#34A853", "#FFBB33", "#FF5733", "#AB47BC"],  # Google colors
+    "Single Color": ["#1f77b4"],  # Monochromatic blue
+    "Viridis": px.colors.sequential.Viridis  # Viridis colormap
+}
+
+# Sidebar for theme selection
 theme = st.sidebar.selectbox(
     "Choose your color theme",
-    ["Primary", "Single Color", "Viridis"]
+    list(color_palettes.keys())
 )
 
 # Store the theme selection in session state
 st.session_state['theme'] = theme
+
+# Display color palette in sidebar
+st.sidebar.markdown("### Color Theme Preview")
+selected_theme_colors = color_palettes.get(theme, color_palettes["Primary"])
+
+# Display color palette
+for color in selected_theme_colors:
+    st.sidebar.markdown(f'<div style="background-color:{color}; width:100px; height:30px; display:inline-block; margin:5px;"></div>', unsafe_allow_html=True)
 
 # Radio buttons for page selection
 selected_page = st.sidebar.radio("Go to", list(pages.keys()))
