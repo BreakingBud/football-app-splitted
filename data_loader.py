@@ -7,14 +7,10 @@ import zipfile
 zip_file_path = 'football_data_matches_scorers_shootouts.zip'
 extraction_dir = 'data/football_data/'
 
-# Extract the zip file function
-def extract_zip_file(zip_path, extract_to):
-    if not os.path.exists(extract_to):
-        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-            zip_ref.extractall(extract_to)
-
-# Extract the data
-extract_zip_file(zip_file_path, extraction_dir)
+# Extract the zip file if it hasn't been extracted yet
+if not os.path.exists(extraction_dir):
+    with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
+        zip_ref.extractall(extraction_dir)
 
 # Utility function to load datasets
 @st.cache_data
