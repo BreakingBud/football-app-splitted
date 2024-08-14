@@ -24,27 +24,33 @@ pages = {
 
 # Color palette options
 color_palettes = {
-    "Primary": ["#4285F4", "#34A853", "#FFBB33", "#FF5733", "#AB47BC"],  # Google colors
-    "Single Color": ["#1f77b4"],  # Monochromatic blue
-    "Viridis": px.colors.sequential.Viridis  # Viridis colormap
+    "Primary": ["#4285F4", "#34A853", "#FFBB33", "#FF4B4B"],
+    "Single Color (Blue)": ["#1f77b4"],
+    "Viridis": px.colors.sequential.Viridis
 }
 
-# Sidebar for theme selection
+# Function to display a small color preview
+def display_palette_preview(palette):
+    import matplotlib.pyplot as plt
+    import numpy as np
+
+    fig, ax = plt.subplots(figsize=(1, 0.5))
+    ax.imshow([palette], aspect='auto')
+    ax.axis('off')
+    st.pyplot(fig, use_container_width=False)
+
+# Sidebar for color theme selection
 theme = st.sidebar.selectbox(
     "Choose your color theme",
-    list(color_palettes.keys())
+    options=list(color_palettes.keys())
 )
 
 # Store the theme selection in session state
 st.session_state['theme'] = theme
 
-# Display color palette in sidebar
-st.sidebar.markdown("### Color Theme Preview")
-selected_theme_colors = color_palettes.get(theme, color_palettes["Primary"])
-
-# Display color palette
-for color in selected_theme_colors:
-    st.sidebar.markdown(f'<div style="background-color:{color}; width:100px; height:30px; display:inline-block; margin:5px;"></div>', unsafe_allow_html=True)
+# Display color palette preview in sidebar
+st.sidebar.subheader("Color Palette Preview")
+display_palette_preview(color_palettes[theme])
 
 # Radio buttons for page selection
 selected_page = st.sidebar.radio("Go to", list(pages.keys()))
