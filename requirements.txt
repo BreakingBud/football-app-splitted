@@ -9,3 +9,4 @@ Pillow
 requests
 streamlit-lottie
 plotly.express
+importlib
