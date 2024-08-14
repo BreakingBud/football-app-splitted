@@ -1,4 +1,5 @@
 import streamlit as st
+import importlib
 
 # Set up the app configuration
 st.set_page_config(
@@ -19,6 +20,6 @@ pages = {
 # Radio buttons for page selection
 selected_page = st.sidebar.radio("Go to", list(pages.keys()))
 
-# Load the selected page as a module
-page = pages[selected_page]
-exec(open(f"{page}.py").read())
+# Load the selected page as a module using importlib
+module = importlib.import_module(pages[selected_page])
+module.show_page()  # Assuming each module has a `show_page` function
