@@ -136,5 +136,5 @@ def display_match_details_table(df):
     st.dataframe(df[['date', 'home_team', 'away_team', 'home_score', 'away_score', 'outcome']], use_container_width=True)
 
 
-# Display the head-to-head analysis page
-show_page(results_df)
+# This function call assumes that `results_df` will be passed from the `app.py` file when this module is imported and executed
+# show_page(results_df)
