@@ -9,13 +9,16 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-def main():
-    st.sidebar.title("Football Analysis App")
-    selected_page = st.sidebar.radio("Choose a page", list(PAGE_TITLES.keys()))
+# Sidebar for navigation
+st.sidebar.title("Navigation")
+selected_page = st.sidebar.radio("Go to", list(PAGE_TITLES.keys()))
 
-    # Load and show the selected page
-    module = importlib.import_module(PAGE_TITLES[selected_page])
+# Load the selected page as a module
+page_module = PAGE_TITLES[selected_page]
+
+# Import the selected page as a module and run the show_page() function
+try:
+    module = importlib.import_module(page_module)
     module.show_page()
-
-if __name__ == "__main__":
-    main()
+except Exception as e:
+    st.error(f"Error loading page '{selected_page}': {e}")
