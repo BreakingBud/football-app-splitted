@@ -3,18 +3,12 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 
-def get_color_theme(theme):
-    if theme == "Primary":
-        return px.colors.qualitative.Set3  # Example of a good palette
-    elif theme == "Single Color (Blue)":
-        return ["#1f77b4"]  # Monochromatic blue palette
-    elif theme == "Viridis":
-        return px.colors.sequential.Viridis
-    else:
-        return px.colors.qualitative.Set3  # Default fallback
-
-def show_page(results_df):
+def show_page(results_df, color_palettes):
     st.title("Head-to-Head Analysis")
+
+    # Get the selected color theme from session state
+    theme = st.session_state['theme']
+    color_theme = color_palettes[theme]
 
     # Ensure the 'date' column is in datetime format
     results_df['date'] = pd.to_datetime(results_df['date'], errors='coerce')
@@ -50,9 +44,6 @@ def show_page(results_df):
         return
     else:
         st.success(f"Found {len(head_to_head_df)} matches between {team1} and {team2}.")
-
-    # Get the color theme
-    color_theme = get_color_theme(st.session_state.get('theme', "Good Palette"))
 
     # Group visualizations in columns
     col1, col2 = st.columns(2)
