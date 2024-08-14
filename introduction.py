@@ -18,15 +18,15 @@ def load_lottie_url(url: str):
 def show_page():
     st.title("Football Analysis App")
     st.markdown("""
-    Welcome to the Football Analysis App! Here you can explore various statistics and insights about football matches.
+    Welcome to the Football Analysis App! Explore detailed statistics and insights about football matches.
 
-    Before you begin, please select your preferred color theme:
+    Please select your preferred color theme from the sidebar and navigate through the app using the menu.
     """)
 
     # Color theme selection
-    theme = st.selectbox(
+    theme = st.sidebar.selectbox(
         "Choose your color theme",
-        ["Primary Color", "Single Color", "Color Blind"]
+        ["Primary Color", "Single Color", "Diverging"]
     )
 
     # Store the theme selection in session state
@@ -38,22 +38,21 @@ def show_page():
     if lottie_data:
         st_lottie(lottie_data, height=300, key="intro_lottie")
 
-    # Display color palettes
+    # Display color palettes in the sidebar
     st.sidebar.title("Color Palette Preview")
     color_palettes = {
         "Primary Color": ["#4285F4", "#34A853", "#FBBC05", "#EA4335"],
         "Single Color": ["#009688", "#00796B", "#004D40", "#00251A"],
-        "Color Blind": ["#E69F00", "#56B4E9", "#009E73", "#F0E442"]
+        "Diverging": ["#E69F00", "#56B4E9", "#009E73", "#F0E442"]
     }
     
-    if 'theme' in st.session_state:
-        theme = st.session_state['theme']
-    else:
-        theme = "Primary Color"
-
     def display_palette_preview(colors):
         for color in colors:
-            st.markdown(f'<div style="background-color: {color}; width: 100px; height: 30px; margin: 5px; display: inline-block;"></div>', unsafe_allow_html=True)
+            st.sidebar.markdown(f'<div style="background-color: {color}; width: 30px; height: 30px; margin: 2px;"></div>', unsafe_allow_html=True)
 
-    st.sidebar.subheader("Color Palette Preview")
-    display_palette_preview(color_palettes[theme])
+    if theme in color_palettes:
+        display_palette_preview(color_palettes[theme])
+
+    st.markdown("### About the App")
+    st.markdown("Use the sidebar to navigate between pages and analyze different football match statistics.")
+
