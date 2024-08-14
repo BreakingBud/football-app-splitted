@@ -15,15 +15,15 @@ def show_page():
     st.title("Football Analysis App")
     st.markdown("""
     Welcome to the Football Analysis App! Explore detailed statistics and insights about football matches.
-    Please select your preferred color theme from the sidebar and navigate through the app using the menu.
+    Please select your preferred color theme from the options below and navigate through the app using the menu.
     """)
 
-    # Color theme selection displayed horizontally
+    # Horizontal color theme selection
     st.markdown("### Choose your color theme:")
     
     color_palettes = {
         "Primary": ["#4285F4", "#34A853", "#FBBC05", "#EA4335"],
-        "Single Color": ["#009688", "#00796B", "#004D40", "#00251A"],
+        "Single Color": ["#1f77b4", "#00509E", "#003F88", "#002A5E"],  # Blue shades
         "Diverging": ["#E69F00", "#56B4E9", "#009E73", "#F0E442"]
     }
 
@@ -40,7 +40,7 @@ def show_page():
     st.markdown("### Selected Color Palette:")
     cols = st.columns(len(color_palettes[selected_palette]))
     for idx, color in enumerate(color_palettes[selected_palette]):
-        cols[idx].markdown(f'<div style="background-color: {color}; height: 50px;"></div>', unsafe_allow_html=True)
+        cols[idx].markdown(f'<div style="background-color: {color}; height: 30px; border-radius: 5px;"></div>', unsafe_allow_html=True)
 
     # Display a Lottie animation at the bottom right corner
     lottie_url = "https://assets5.lottiefiles.com/packages/lf20_YXD37q.json"
@@ -49,7 +49,7 @@ def show_page():
         st.markdown(
             f"""
             <div style="position: fixed; bottom: 0px; right: 0px;">
-                {st_lottie(lottie_data, height=150, key="intro_lottie")}
+                {st_lottie(lottie_data, height=100, key="intro_lottie")}
             </div>
             """,
             unsafe_allow_html=True,
