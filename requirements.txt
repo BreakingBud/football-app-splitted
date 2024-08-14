@@ -5,3 +5,4 @@ streamlit
 tensorflow
 pandas
 plotly
+Pillow
