@@ -32,5 +32,5 @@ def load_and_preprocess_data(zip_file_path, extract_path):
     results_df['goal_difference'] = results_df['home_score'] - results_df['away_score']
     results_df['home_win'] = (results_df['home_score'] > results_df['away_score']).astype(int)
 
-    # Return necessary values including the team_encoder
+    # Return the processed data, label encoders, scaler, and the team encoder
     return results_df, label_encoders, scaler, label_encoders['home_team']
