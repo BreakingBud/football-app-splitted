@@ -7,15 +7,18 @@ from model import create_model
 # Load and preprocess data
 zip_file_path = 'football_data_matches_scorers_shootouts.zip'
 extract_path = '/tmp/extracted_data'
-results_df, label_encoders, scaler = load_and_preprocess_data(zip_file_path, extract_path)
+results_df, label_encoders, scaler, team_encoder = load_and_preprocess_data(zip_file_path, extract_path)
 
 st.title("FIFA World Cup Knockout Stage Prediction")
+
+# Get the original team names before encoding
+team_names = team_encoder.classes_
 
 # User inputs for the 16 teams
 st.subheader("Select the 16 teams that qualified for the knockout stage")
 teams = []
 for i in range(1, 17):
-    team = st.selectbox(f"Team {i}", options=results_df['home_team'].unique(), key=f"team_{i}")
+    team = st.selectbox(f"Team {i}", options=team_names, key=f"team_{i}")
     if team:
         teams.append(team)
 
@@ -32,8 +35,8 @@ if len(teams) == 16:
     # Predict winners for each match
     winners = []
     for match in matches:
-        home_team_encoded = label_encoders['home_team'].transform([match[0]])[0]
-        away_team_encoded = label_encoders['away_team'].transform([match[1]])[0]
+        home_team_encoded = team_encoder.transform([match[0]])[0]
+        away_team_encoded = team_encoder.transform([match[1]])[0]
         input_data = np.array([[home_team_encoded, away_team_encoded]])
         input_data = scaler.transform(input_data)
         
@@ -48,8 +51,8 @@ if len(teams) == 16:
     quarterfinals = [(winners[i], winners[i+1]) for i in range(0, len(winners), 2)]
     winners_quarterfinals = []
     for match in quarterfinals:
-        home_team_encoded = label_encoders['home_team'].transform([match[0]])[0]
-        away_team_encoded = label_encoders['away_team'].transform([match[1]])[0]
+        home_team_encoded = team_encoder.transform([match[0]])[0]
+        away_team_encoded = team_encoder.transform([match[1]])[0]
         input_data = np.array([[home_team_encoded, away_team_encoded]])
         input_data = scaler.transform(input_data)
         
@@ -61,8 +64,8 @@ if len(teams) == 16:
     semifinals = [(winners_quarterfinals[0], winners_quarterfinals[1]), (winners_quarterfinals[2], winners_quarterfinals[3])]
     winners_semifinals = []
     for match in semifinals:
-        home_team_encoded = label_encoders['home_team'].transform([match[0]])[0]
-        away_team_encoded = label_encoders['away_team'].transform([match[1]])[0]
+        home_team_encoded = team_encoder.transform([match[0]])[0]
+        away_team_encoded = team_encoder.transform([match[1]])[0]
         input_data = np.array([[home_team_encoded, away_team_encoded]])
         input_data = scaler.transform(input_data)
         
@@ -72,8 +75,8 @@ if len(teams) == 16:
         winners_semifinals.append(winner)
 
     final = (winners_semifinals[0], winners_semifinals[1])
-    home_team_encoded = label_encoders['home_team'].transform([final[0]])[0]
-    away_team_encoded = label_encoders['away_team'].transform([final[1]])[0]
+    home_team_encoded = team_encoder.transform([final[0]])[0]
+    away_team_encoded = team_encoder.transform([final[1]])[0]
     input_data = np.array([[home_team_encoded, away_team_encoded]])
     input_data = scaler.transform(input_data)
 
@@ -103,7 +106,4 @@ if len(teams) == 16:
     for i, winner in enumerate(winners_quarterfinals):
         draw.text(positions[12+i], winner, font=font, fill="black")
 
-    draw.text(positions[14], final_winner, font=font, fill="black")
-
-    # Display the filled bracket image
-    st.image(image, caption="World Cup Knockout Predictions", use_column_width=True)
+    draw.te
