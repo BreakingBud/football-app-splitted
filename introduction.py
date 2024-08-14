@@ -5,9 +5,8 @@ from streamlit_lottie import st_lottie
 def show_page():
     st.title("Football Analysis App")
     st.markdown("""
-    Welcome to the Football Analysis App! Explore detailed statistics and insights about teams and players.
+    Welcome to the Football Analysis App! Explore detailed statistics and insights about teams, players and predictions
     """)
-    st.markdown("#### .")
     # Horizontal color theme selection
     st.markdown("### Choose your color theme:")
     
