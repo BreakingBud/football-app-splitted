@@ -12,11 +12,11 @@ try:
     data_loaded = True
 except Exception as e:
     st.error(f"Error loading data: {e}")
-    st.stop()
+    st.stop()  # Stop the app if data loading fails
 
 def show_page():
     if not data_loaded or results_df.empty:
-        st.error("Data could not be loaded. Please check the data source and try again.")
+        st.error("Data could not be loaded or is empty. Please check the data source and try again.")
         return
 
     st.title("Head-to-Head Analysis")
