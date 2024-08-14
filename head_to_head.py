@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd  # Ensure pandas is imported
 import plotly.express as px
 import plotly.graph_objects as go
 from data_loader import load_data
