@@ -6,9 +6,7 @@ from data_loader import load_data
 # Load the data
 goalscorers_df, results_df, shootouts_df = load_data()
 
-def show_page():
-    global results_df  # Declare as global to access the variable defined outside the function
-
+def show_page(results_df):
     st.title("Head-to-Head Analysis")
     st.markdown("""
     Compare the performance of two teams across various matches. Use the filters to customize your analysis.
