@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-def show_page(goalscorers_df):
+def show_page(goalscorers_df=None):
     st.title("Player-to-Player Analysis")
     st.markdown("""
     ### Compare the Performance of Two Players
