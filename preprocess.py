@@ -8,7 +8,7 @@ def load_and_preprocess_data(zip_file_path, extract_path):
     results_df = pd.read_csv(f'{extract_path}/results.csv')
     shootouts_df = pd.read_csv(f'{extract_path}/shootouts.csv')
 
-    # Encode categorical variables (excluding location-related columns)
+    # Encode categorical variables
     label_encoders = {}
     categorical_columns = ['home_team', 'away_team', 'tournament']
     for col in categorical_columns:
@@ -30,6 +30,3 @@ def load_and_preprocess_data(zip_file_path, extract_path):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
     return X_train, X_test, y_train, y_test, label_encoders, scaler, label_encoders.get('home_team', None)
-
-# Example usage
-# load_and_preprocess_data('path_to_zip_file', 'path_to_extract')
