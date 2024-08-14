@@ -1,8 +1,33 @@
 import streamlit as st
 
 def show_page():
-    st.title("Introduction")
+    st.title("Football Analysis App")
     st.markdown("""
-    ### Welcome to the Football Analysis App
-    Use the navigation on the left to explore various analyses of football data.
+    Welcome to the Football Analysis App! Here you can explore various statistics and insights about football matches.
+
+    Before you begin, please select your preferred color theme:
     """)
+
+    # Color theme selection
+    theme = st.selectbox(
+        "Choose your color theme",
+        ["Good Palette", "Single Color", "Viridis"]
+    )
+
+    # Store the theme selection in session state
+    st.session_state['theme'] = theme
+
+    # Display a Lottie animation
+    st_lottie_url = "https://assets5.lottiefiles.com/packages/lf20_YXD37q.json"  # Example football Lottie animation URL
+    st_lottie(st_lottie_url, height=300, key="intro_lottie")
+
+# Use the `st_lottie` function from `streamlit-lottie` library
+def st_lottie(url: str, height: int, key: str):
+    import requests
+    from streamlit_lottie import st_lottie
+
+    r = requests.get(url)
+    if r.status_code != 200:
+        return None
+    return st_lottie(r.json(), height=height, key=key)
+
