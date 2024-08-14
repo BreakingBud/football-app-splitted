@@ -14,13 +14,16 @@ st.title("FIFA World Cup Knockout Stage Prediction")
 # Get the original team names before encoding
 team_names = team_encoder.classes_
 
+# Get top 16 teams by goals scored
+top_teams = results_df.groupby('home_team')['home_score'].sum().sort_values(ascending=False).head(16).index.tolist()
+top_teams = [team_encoder.inverse_transform([team])[0] for team in top_teams]
+
 # User inputs for the 16 teams
 st.subheader("Select the 16 teams that qualified for the knockout stage")
 teams = []
-for i in range(1, 17):
-    team = st.selectbox(f"Team {i}", options=team_names, key=f"team_{i}")
-    if team:
-        teams.append(team)
+for i in range(16):
+    team = st.selectbox(f"Team {i+1}", options=team_names, index=team_names.tolist().index(top_teams[i]), key=f"team_{i}")
+    teams.append(team)
 
 # Ensure 16 teams are selected
 if len(teams) == 16:
