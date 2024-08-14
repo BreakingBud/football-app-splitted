@@ -1,48 +1,43 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-from data_loader import load_data
 
-# Load the data
-goalscorers_df, results_df, shootouts_df = load_data()
-
-def show_player_analysis():
+def show_page(goalscorers_df):
     st.title("Player-to-Player Analysis")
     st.markdown("""
-    ### Compare Performance Between Two Players
-
-    Select players from the dropdown menus to see a side-by-side comparison of their goal-scoring performance over time.
+    ### Compare the Performance of Two Players
+    Select two players to compare their goal-scoring records over time.
     """)
 
-    # Use 'scorer' instead of 'player' and allow selection from the list
-    player_list = goalscorers_df['scorer'].unique()
-    player1 = st.selectbox('Select Player 1', options=player_list, index=0, key="player1_select")
-    player2 = st.selectbox('Select Player 2', options=player_list, index=1, key="player2_select")
+    # Dropdowns for player selection
+    player1 = st.selectbox("Select Player 1", options=sorted(goalscorers_df['scorer'].unique()))
+    player2 = st.selectbox("Select Player 2", options=sorted(goalscorers_df['scorer'].unique()))
 
-    # Filter data based on selected players
-    player1_data = goalscorers_df.loc[goalscorers_df['scorer'] == player1].copy()
-    player2_data = goalscorers_df.loc[goalscorers_df['scorer'] == player2].copy()
+    # Filter data by selected players
+    player1_data = goalscorers_df[goalscorers_df['scorer'] == player1]
+    player2_data = goalscorers_df[goalscorers_df['scorer'] == player2]
 
-    # Ensure 'date' is in datetime format and handle any conversion errors
-    try:
-        player1_data['date'] = pd.to_datetime(player1_data['date'], errors='coerce')
-        player2_data['date'] = pd.to_datetime(player2_data['date'], errors='coerce')
-    except Exception as e:
-        st.error(f"Error converting dates: {e}")
+    if player1_data.empty or player2_data.empty:
+        st.warning("No data available for the selected players.")
         return
 
-    # Drop rows with NaT values in the date column (in case conversion failed for some rows)
+    # Convert 'date' column to datetime
+    player1_data['date'] = pd.to_datetime(player1_data['date'], errors='coerce')
+    player2_data['date'] = pd.to_datetime(player2_data['date'], errors='coerce')
+
+    # Drop rows with NaT values in the date column
     player1_data = player1_data.dropna(subset=['date'])
     player2_data = player2_data.dropna(subset=['date'])
 
     if player1_data.empty or player2_data.empty:
-        st.warning("No data available for the selected players.")
+        st.warning("No data available for the selected players after date filtering.")
         return
 
     # Group data by year and count goals
     player1_goals = player1_data.groupby(player1_data['date'].dt.year)['scorer'].count().reset_index(name=f'{player1} Goals')
     player2_goals = player2_data.groupby(player2_data['date'].dt.year)['scorer'].count().reset_index(name=f'{player2} Goals')
 
+    # Plot goals over time for each player
     if not player1_goals.empty and not player2_goals.empty:
         col1, col2 = st.columns(2)
 
@@ -69,5 +64,3 @@ def show_player_analysis():
 
     else:
         st.warning("No data available for the selected players.")
-
-show_player_analysis()
