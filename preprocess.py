@@ -7,10 +7,16 @@ def load_and_preprocess_data(zip_file_path, extract_path):
     with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
         zip_ref.extractall(extract_path)
 
+    # Load the results data
     results_df = pd.read_csv(os.path.join(extract_path, 'results.csv'))
 
-    # Filter for FIFA World Cup knockout matches
-    results_df = results_df[(results_df['tournament'] == 'FIFA World Cup') & (results_df['stage'] != 'Group Stage')]
+    # Check if the 'stage' column exists
+    if 'stage' in results_df.columns:
+        # Filter for FIFA World Cup knockout matches
+        results_df = results_df[(results_df['tournament'] == 'FIFA World Cup') & (results_df['stage'] != 'Group Stage')]
+    else:
+        # If 'stage' column does not exist, filter only by 'FIFA World Cup' tournament
+        results_df = results_df[results_df['tournament'] == 'FIFA World Cup']
 
     # Encode categorical variables
     categorical_columns = ['home_team', 'away_team', 'country', 'city']
