@@ -14,7 +14,7 @@ def main():
     selected_page = st.sidebar.radio("Choose a page", list(PAGE_TITLES.keys()))
 
     # Load and show the selected page
-    module = importlib.import_module(f'{PAGE_TITLES[selected_page]}')
+    module = importlib.import_module(PAGE_TITLES[selected_page])
     module.show_page()
 
 if __name__ == "__main__":
