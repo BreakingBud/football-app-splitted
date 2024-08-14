@@ -1,13 +1,8 @@
 import streamlit as st
 
-def show_intro():
-    st.title("Football Analysis App")
+def show_page():
+    st.title("Introduction")
     st.markdown("""
     ### Welcome to the Football Analysis App
-    
-    Explore historical football match data and analyze head-to-head matchups and player performance across different teams.
-    
-    Use the sidebar to navigate through different sections of the app.
+    Use the navigation on the left to explore various analyses of football data.
     """)
-
-show_intro()
