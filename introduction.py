@@ -39,5 +39,5 @@ def show_page():
     lottie_url = "https://lottie.host/de4d9a89-99eb-4afc-8507-2475c4edfd56/4mwcHwmWjR.json"  # Use a football bouncing animation URL
     lottie_data = load_lottie_url(lottie_url)
     if lottie_data:
-        st_lottie(lottie_data, height=400, key="intro_lottie", quality="high", speed=0.8)
+        st_lottie(lottie_data, height=600, key="intro_lottie", quality="high", speed=0.8)
 
