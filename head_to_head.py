@@ -3,6 +3,16 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 
+def get_color_theme(theme):
+    if theme == "Good Palette":
+        return px.colors.qualitative.Plotly
+    elif theme == "Single Color":
+        return ["#1f77b4"]  # A single color palette
+    elif theme == "Viridis":
+        return px.colors.sequential.Viridis
+    else:
+        return px.colors.qualitative.Plotly  # Default fallback
+
 def show_page(results_df):
     st.title("Head-to-Head Analysis")
 
@@ -41,22 +51,24 @@ def show_page(results_df):
     else:
         st.success(f"Found {len(head_to_head_df)} matches between {team1} and {team2}.")
 
+    # Get the color theme
+    color_theme = get_color_theme(st.session_state.get('theme', "Good Palette"))
+
     # Group visualizations in columns
     col1, col2 = st.columns(2)
 
     with col1:
-        display_win_rate_pie_chart(head_to_head_df, team1, team2)
-        display_goals_heatmap(head_to_head_df, team1, team2)
+        display_win_rate_pie_chart(head_to_head_df, team1, team2, color_theme)
+        display_goals_heatmap(head_to_head_df, team1, team2, color_theme)
         
     with col2:
-        display_match_results_timeline(head_to_head_df, team1, team2)
-        display_goals_distribution_bar_chart(head_to_head_df, team1, team2)
+        display_match_results_timeline(head_to_head_df, team1, team2, color_theme)
+        display_goals_distribution_bar_chart(head_to_head_df, team1, team2, color_theme)
 
     # Display tables at the end
     with st.expander("Detailed Match Information"):
         display_shootout_data(head_to_head_df)
         display_match_details_table(head_to_head_df)
-
 
 def filter_head_to_head_data(df, team1, team2, tournament, start_date, end_date):
     # Filter data based on selected teams, tournament, and date range
@@ -67,32 +79,26 @@ def filter_head_to_head_data(df, team1, team2, tournament, start_date, end_date)
         (df['date'].between(start_date, end_date))
     ]
 
-
-def display_win_rate_pie_chart(df, team1, team2):
-    # Pie Chart for Win Rate
+def display_win_rate_pie_chart(df, team1, team2, color_theme):
     df['outcome_label'] = df['outcome'].apply(
         lambda x: f'{team1} Win' if x == team1 else f'{team2} Win' if x == team2 else 'Draw'
     )
     outcome_counts = df['outcome_label'].value_counts()
-    fig = px.pie(outcome_counts, names=outcome_counts.index, values=outcome_counts.values, title="Win Rate")
+    fig = px.pie(outcome_counts, names=outcome_counts.index, values=outcome_counts.values, title="Win Rate", color_discrete_sequence=color_theme)
     st.plotly_chart(fig, use_container_width=True)
 
-
-def display_match_results_timeline(df, team1, team2):
-    # Line Chart for Match Results Timeline
-    fig = px.line(df, x='date', y='outcome_label', title='Match Results Over Time', markers=True)
+def display_match_results_timeline(df, team1, team2, color_theme):
+    fig = px.line(df, x='date', y='outcome_label', title='Match Results Over Time', markers=True, color_discrete_sequence=color_theme)
     fig.update_yaxes(title='Match Outcome', categoryorder='array', categoryarray=[f'{team1} Win', f'{team2} Win', 'Draw'])
     st.plotly_chart(fig, use_container_width=True)
 
-
-def display_goals_distribution_bar_chart(df, team1, team2):
-    # Grouped Bar Chart for Goals Scored Distribution
+def display_goals_distribution_bar_chart(df, team1, team2, color_theme):
     fig = go.Figure()
-    fig.add_trace(go.Histogram(x=df['home_score'], name=f'{team1} Goals', marker_color='blue', opacity=0.75))
-    fig.add_trace(go.Histogram(x=df['away_score'], name=f'{team2} Goals', marker_color='orange', opacity=0.75))
+    fig.add_trace(go.Histogram(x=df['home_score'], name=f'{team1} Goals', marker_color=color_theme[0], opacity=0.75))
+    fig.add_trace(go.Histogram(x=df['away_score'], name=f'{team2} Goals', marker_color=color_theme[1] if len(color_theme) > 1 else color_theme[0], opacity=0.75))
 
     fig.update_layout(
-        barmode='group',  # Use group mode instead of overlay
+        barmode='group',
         title='Goals Scored Distribution',
         xaxis_title='Goals',
         yaxis_title='Count'
@@ -100,17 +106,13 @@ def display_goals_distribution_bar_chart(df, team1, team2):
 
     st.plotly_chart(fig, use_container_width=True)
 
-
-def display_goals_heatmap(df, team1, team2):
-    # Create a pivot table for heatmap
+def display_goals_heatmap(df, team1, team2, color_theme):
     heatmap_data = df.pivot_table(index='home_score', columns='away_score', aggfunc='size', fill_value=0)
-
-    # Plot the heatmap using Plotly
     fig = go.Figure(data=go.Heatmap(
         z=heatmap_data.values,
         x=heatmap_data.columns,
         y=heatmap_data.index,
-        colorscale='Blues'
+        colorscale=color_theme if isinstance(color_theme, str) else color_theme[:5]
     ))
 
     fig.update_layout(
@@ -121,20 +123,12 @@ def display_goals_heatmap(df, team1, team2):
 
     st.plotly_chart(fig, use_container_width=True)
 
-
 def display_shootout_data(df):
-    # Display Shootout Data if available
     shootout_matches = df[df['shootout'] == True]
     if not shootout_matches.empty:
         st.markdown("### Shootout Matches:")
         st.dataframe(shootout_matches[['date', 'home_team', 'away_team', 'winner']], use_container_width=True)
 
-
 def display_match_details_table(df):
-    # Display Table of Match Details
     st.markdown("### Match Details:")
     st.dataframe(df[['date', 'home_team', 'away_team', 'home_score', 'away_score', 'outcome']], use_container_width=True)
-
-
-# This function call assumes that `results_df` will be passed from the `app.py` file when this module is imported and executed
-# show_page(results_df)
