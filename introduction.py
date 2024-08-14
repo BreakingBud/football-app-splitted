@@ -1,14 +1,25 @@
 import streamlit as st
-from helpers import load_lottie_url
+from helpers import load_lottie_url, get_color_theme  # Make sure to import get_color_theme
+from streamlit_lottie import st_lottie  # Ensure this is imported to use st_lottie
 
 def show_page():
     st.title("Football Analysis App")
-    st.markdown("Welcome to the Football Analysis App! Explore detailed statistics and insights about teams and players.")
+    st.markdown("""
+    Welcome to the Football Analysis App! Explore detailed statistics and insights about teams and players.
+    """)
 
     # Horizontal color theme selection
     st.markdown("### Choose your color theme:")
+
+    # Define the available color themes
     color_palettes = ["Primary", "Single Color", "Diverging"]
-    selected_palette = st.radio("", options=color_palettes, horizontal=True)
+
+    # Display radio buttons for selecting a color theme
+    selected_palette = st.radio(
+        label="",
+        options=color_palettes,
+        horizontal=True
+    )
 
     # Store the theme selection in session state
     st.session_state['theme'] = selected_palette
