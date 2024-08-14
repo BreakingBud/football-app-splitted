@@ -16,7 +16,7 @@ goalscorers_df, results_df, shootouts_df = load_data()
 # Sidebar for navigation and theme selection
 st.sidebar.title("Navigation")
 pages = {
-    "Introduction": "introduction",
+    "Introduction": "intro",
     "Head-to-Head Analysis": "head_to_head",
     "Player-to-Player Analysis": "player_analysis",
     "Choropleth Map": "choropleth_map"
@@ -31,13 +31,10 @@ color_palettes = {
 
 # Function to display a small color preview
 def display_palette_preview(palette):
-    import matplotlib.pyplot as plt
-    import numpy as np
-
-    fig, ax = plt.subplots(figsize=(1, 0.5))
-    ax.imshow([palette], aspect='auto')
-    ax.axis('off')
-    st.pyplot(fig, use_container_width=False)
+    # Display color previews directly in Streamlit
+    st.write("Color Palette Preview:")
+    for color in palette:
+        st.markdown(f'<div style="background-color: {color}; height: 30px; width: 100%;"></div>', unsafe_allow_html=True)
 
 # Sidebar for color theme selection
 theme = st.sidebar.selectbox(
