@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from data_loader import load_data
@@ -6,29 +7,19 @@ from data_loader import load_data
 # Load the data
 goalscorers_df, results_df, shootouts_df = load_data()
 
-def show_page(results_df):
+# Ensure the 'date' column is in datetime format
+results_df['date'] = pd.to_datetime(results_df['date'], errors='coerce')
+results_df = results_df.dropna(subset=['date'])
+
+# Set a reasonable minimum date
+min_date = results_df['date'].min()
+max_date = results_df['date'].max()
+
+def show_head_to_head():
     st.title("Head-to-Head Analysis")
-    st.markdown("""
-    Compare the performance of two teams across various matches. Use the filters to customize your analysis.
-    """)
-
-    if results_df is None or results_df.empty:
-        st.error("Data could not be loaded or is empty. Please check the data source and try again.")
-        return
-
-    # Ensure the 'date' column is in datetime format and clean the data
-    results_df['date'] = pd.to_datetime(results_df['date'], errors='coerce')
-    results_df = results_df.dropna(subset=['date'])
-
-    # Set minimum and maximum dates for the slider
-    min_date = results_df['date'].min()
-    max_date = results_df['date'].max()
-
-    # User input for selecting teams, tournament, and date range
-    team1 = st.selectbox('Select Team 1', sorted(results_df['home_team'].unique()))
-    team2 = st.selectbox('Select Team 2', sorted(results_df['away_team'].unique()))
-
-    tournament = st.selectbox('Select Tournament', ['All'] + sorted(results_df['tournament'].unique()))
+    team1 = st.selectbox('Select Team 1', results_df['home_team'].unique())
+    team2 = st.selectbox('Select Team 2', results_df['home_team'].unique())
+    tournament = st.selectbox('Select Tournament', ['All'] + sorted(results_df['tournament'].unique().tolist()))
     tournament = '' if tournament == 'All' else tournament
 
     start_date, end_date = st.slider(
@@ -40,9 +31,9 @@ def show_page(results_df):
     )
 
     # Filter the data based on user input
-    head_to_head_df = results_df[
+    head_to_head_df = results_df.loc[
         (((results_df['home_team'] == team1) & (results_df['away_team'] == team2)) |
-         ((results_df['home_team'] == team2) & (results_df['away_team'] == team1))) &
+        ((results_df['home_team'] == team2) & (results_df['away_team'] == team1))) &
         (results_df['tournament'].str.contains(tournament, case=False, na=False)) &
         (results_df['date'].between(start_date, end_date))
     ]
@@ -52,7 +43,8 @@ def show_page(results_df):
     
     if total_matches > 0:
         # Pie Chart for Win Rate
-        head_to_head_df['outcome_label'] = head_to_head_df['outcome'].apply(
+        head_to_head_df = head_to_head_df.copy()  # Avoid SettingWithCopyWarning
+        head_to_head_df.loc[:, 'outcome_label'] = head_to_head_df['outcome'].apply(
             lambda x: f'{team1} Win' if x == team1 else f'{team2} Win' if x == team2 else 'Draw'
         )
         outcome_counts = head_to_head_df['outcome_label'].value_counts()
@@ -89,3 +81,5 @@ def show_page(results_df):
         st.dataframe(head_to_head_df[['date', 'home_team', 'away_team', 'home_score', 'away_score', 'outcome']], use_container_width=True)
     else:
         st.markdown("No matches found for the selected filters.")
+
+show_head_to_head()
