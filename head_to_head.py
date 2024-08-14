@@ -1,5 +1,4 @@
 import streamlit as st
-import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from data_loader import load_data
@@ -38,89 +37,53 @@ def show_page():
     )
 
     # Filter the data based on user input
-    head_to_head_df = filter_head_to_head_data(results_df, team1, team2, tournament, start_date, end_date)
-
-    # Display message if no matches are found
-    if head_to_head_df.empty:
-        st.warning("No matches found for the selected filters.")
-        return
-    else:
-        st.success(f"Found {len(head_to_head_df)} matches between {team1} and {team2}.")
-
-    # Get the selected color theme
-    color_theme = get_color_theme(st.session_state.get('theme', "Primary"))
-
-    # Group visualizations into two columns for better layout
-    col1, col2 = st.columns(2)
-
-    # Display visualizations in the left column
-    with col1:
-        display_win_rate_pie_chart(head_to_head_df, team1, team2, color_theme)
-        display_goals_heatmap(head_to_head_df, team1, team2, color_theme)
-        
-    # Display visualizations in the right column
-    with col2:
-        display_match_results_timeline(head_to_head_df, team1, team2, color_theme)
-        display_goals_distribution_bar_chart(head_to_head_df, team1, team2, color_theme)
-
-    # Expandable section for detailed match information
-    with st.expander("Detailed Match Information"):
-        display_match_details_table(head_to_head_df)
-
-# Function to filter data based on user input
-def filter_head_to_head_data(df, team1, team2, tournament, start_date, end_date):
-    return df.loc[
-        (((df['home_team'] == team1) & (df['away_team'] == team2)) |
-        ((df['home_team'] == team2) & (df['away_team'] == team1))) &
-        (df['tournament'].str.contains(tournament, case=False, na=False)) &
-        (df['date'].between(start_date, end_date))
+    head_to_head_df = results_df.loc[
+        (((results_df['home_team'] == team1) & (results_df['away_team'] == team2)) |
+        ((results_df['home_team'] == team2) & (results_df['away_team'] == team1))) &
+        (results_df['tournament'].str.contains(tournament, case=False, na=False)) &
+        (results_df['date'].between(start_date, end_date))
     ]
 
-# Function to display a pie chart of match outcomes (win rate)
-def display_win_rate_pie_chart(df, team1, team2, color_theme):
-    df['outcome_label'] = df['outcome'].apply(
-        lambda x: f'{team1} Win' if x == team1 else f'{team2} Win' if x == team2 else 'Draw'
-    )
-    outcome_counts = df['outcome_label'].value_counts()
-    fig = px.pie(outcome_counts, names=outcome_counts.index, values=outcome_counts.values, title="Win Rate", color_discrete_sequence=color_theme)
-    st.plotly_chart(fig, use_container_width=True)
+    total_matches = len(head_to_head_df)
+    st.markdown(f"**{team1}** and **{team2}** played **{total_matches}** matches head to head.")
+    
+    if total_matches > 0:
+        # Pie Chart for Win Rate
+        head_to_head_df = head_to_head_df.copy()  # Avoid SettingWithCopyWarning
+        head_to_head_df.loc[:, 'outcome_label'] = head_to_head_df['outcome'].apply(
+            lambda x: f'{team1} Win' if x == team1 else f'{team2} Win' if x == team2 else 'Draw'
+        )
+        outcome_counts = head_to_head_df['outcome_label'].value_counts()
+        fig = px.pie(outcome_counts, names=outcome_counts.index, values=outcome_counts.values, title="Win Rate")
+        st.plotly_chart(fig, use_container_width=True)
 
-# Function to display a timeline of match results
-def display_match_results_timeline(df, team1, team2, color_theme):
-    fig = px.line(df, x='date', y='outcome_label', title='Match Results Over Time', markers=True, color_discrete_sequence=color_theme)
-    fig.update_yaxes(title='Match Outcome', categoryorder='array', categoryarray=[f'{team1} Win', f'{team2} Win', 'Draw'])
-    st.plotly_chart(fig, use_container_width=True)
+        # Line Chart for Match Results Timeline
+        fig2 = px.line(head_to_head_df, x='date', y='outcome_label', title='Match Results Over Time', markers=True)
+        fig2.update_yaxes(title='Match Outcome', categoryorder='array', categoryarray=[f'{team1} Win', f'{team2} Win', 'Draw'])
+        st.plotly_chart(fig2, use_container_width=True)
 
-# Function to display a bar chart of goals scored by each team
-def display_goals_distribution_bar_chart(df, team1, team2, color_theme):
-    fig = go.Figure()
-    fig.add_trace(go.Histogram(x=df['home_score'], name=f'{team1} Goals', marker_color=color_theme[0], opacity=0.75))
-    fig.add_trace(go.Histogram(x=df['away_score'], name=f'{team2} Goals', marker_color=color_theme[1] if len(color_theme) > 1 else color_theme[0], opacity=0.75))
+        # Grouped Bar Chart for Goals Scored Distribution
+        fig3 = go.Figure()
+        fig3.add_trace(go.Histogram(x=head_to_head_df['home_score'], name=f'{team1} Goals', marker_color='blue', opacity=0.75))
+        fig3.add_trace(go.Histogram(x=head_to_head_df['away_score'], name=f'{team2} Goals', marker_color='orange', opacity=0.75))
 
-    fig.update_layout(
-        barmode='group',
-        title='Goals Scored Distribution',
-        xaxis_title='Goals',
-        yaxis_title='Count'
-    )
-    st.plotly_chart(fig, use_container_width=True)
+        fig3.update_layout(
+            barmode='group',  # Use group mode instead of overlay
+            title='Goals Scored Distribution',
+            xaxis_title='Goals',
+            yaxis_title='Count'
+        )
 
-# Function to display a heatmap of goals scored by each team
-def display_goals_heatmap(df, team1, team2, color_theme):
-    heatmap_data = df.pivot_table(index='home_score', columns='away_score', aggfunc='size', fill_value=0)
-    fig = go.Figure(data=go.Heatmap(
-        z=heatmap_data.values,
-        x=heatmap_data.columns,
-        y=heatmap_data.index,
-        colorscale=color_theme if isinstance(color_theme, list) else 'Viridis'
-    ))
-    fig.update_layout(
-        title=f"Goals Heatmap: {team1} vs {team2}",
-        xaxis_title=f"{team2} Goals",
-        yaxis_title=f"{team1} Goals"
-    )
-    st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig3, use_container_width=True)
 
-# Function to display a detailed match information table
-def display_match_details_table(df):
-    st.dataframe(df[['date', 'home_team', 'away_team', 'home_score', 'away_score', 'outcome']], use_container_width=True)
+        # Display Shootout Data if available
+        shootout_matches = head_to_head_df[head_to_head_df['shootout'] == True]
+        if not shootout_matches.empty:
+            st.markdown("### Shootout Matches:")
+            st.dataframe(shootout_matches[['date', 'home_team', 'away_team', 'winner']], use_container_width=True)
+        
+        # Display Table of Match Details
+        st.markdown("### Match Details:")
+        st.dataframe(head_to_head_df[['date', 'home_team', 'away_team', 'home_score', 'away_score', 'outcome']], use_container_width=True)
+    else:
+        st.markdown("No matches found for the selected filters.")
