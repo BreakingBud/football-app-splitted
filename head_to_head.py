@@ -2,9 +2,13 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+from data_loader import load_data
 from helpers import get_color_theme
 
-def show_page(results_df):
+# Load the data
+goalscorers_df, results_df, shootouts_df = load_data()
+
+def show_page():
     st.title("Head-to-Head Analysis")
     st.markdown("""
     Compare the performance of two teams across various matches. Use the filters to customize your analysis.
