@@ -2,7 +2,7 @@ import streamlit as st
 import plotly.express as px
 import plotly.graph_objects as go
 
-def show_page(results_df):
+def show_page(results_df=None):
     st.title("Choropleth Map")
     st.markdown("""
     ### Global Football Match Insights
