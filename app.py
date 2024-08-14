@@ -1,6 +1,17 @@
 import streamlit as st
+import zipfile
+import os
 
-# Set up the app configuration
+# Path to the uploaded zip file and extraction directory
+uploaded_zip_file = 'data.zip'
+extracted_path = 'extracted_data'
+
+# Extract the zip file
+if not os.path.exists(extracted_path):
+    with zipfile.ZipFile(uploaded_zip_file, 'r') as zip_ref:
+        zip_ref.extractall(extracted_path)
+
+# Set up the Streamlit app configuration
 st.set_page_config(
     page_title="Football Analysis App",
     layout="wide",
