@@ -2,23 +2,12 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-
-def get_color_theme(theme):
-    # Define color themes based on user selection
-    if theme == "Primary Color":
-        return ["#4285F4", "#34A853", "#FBBC05", "#EA4335"]  # Google colors
-    elif theme == "Single Color":
-        return ["#1f77b4"]  # Monochromatic blue palette
-    elif theme == "Diverging":
-        return ["#E69F00", "#56B4E9", "#009E73", "#F0E442"]  # Diverging colors
-    else:
-        return ["#4285F4"]  # Default fallback
+from helpers import get_color_theme
 
 def show_page(results_df):
-    # Title and Introduction
     st.title("Head-to-Head Analysis")
     st.markdown("""
-    Analyze the historical match outcomes between two football teams. Use the filters below to refine the data.
+    Compare the performance of two teams across various matches. Use the filters to customize your analysis.
     """)
 
     # Ensure the 'date' column is in datetime format and clean the data
@@ -55,7 +44,7 @@ def show_page(results_df):
         st.success(f"Found {len(head_to_head_df)} matches between {team1} and {team2}.")
 
     # Get the selected color theme
-    color_theme = get_color_theme(st.session_state.get('theme', "Primary Color"))
+    color_theme = get_color_theme(st.session_state.get('theme', "Primary"))
 
     # Group visualizations into two columns for better layout
     col1, col2 = st.columns(2)
@@ -119,9 +108,8 @@ def display_goals_heatmap(df, team1, team2, color_theme):
         z=heatmap_data.values,
         x=heatmap_data.columns,
         y=heatmap_data.index,
-        colorscale=color_theme
+        colorscale=color_theme if isinstance(color_theme, list) else 'Viridis'
     ))
-
     fig.update_layout(
         title=f"Goals Heatmap: {team1} vs {team2}",
         xaxis_title=f"{team2} Goals",
@@ -131,4 +119,4 @@ def display_goals_heatmap(df, team1, team2, color_theme):
 
 # Function to display a detailed match information table
 def display_match_details_table(df):
-    st.dataframe(df[['date', 'home_team', 'away_team', 'home_score', 'away_score', 'tournament', 'outcome']])
+    st.dataframe(df[['date', 'home_team', 'away_team', 'home_score', 'away_score', 'outcome']], use_container_width=True)
