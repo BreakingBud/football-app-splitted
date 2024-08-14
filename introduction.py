@@ -36,8 +36,8 @@ def show_page():
     )
 
     # Display a larger Lottie animation at the bottom
-    lottie_url = "https://lottie.host/89057c52-70ef-444e-952c-988c03e80a6a/KvI0AtqNdI.json"  # Use a football bouncing animation URL
+    lottie_url = "https://lottie.host/832d7fdb-aaf7-476e-9a40-bbecdac134a3/9VkcV5LnWA.json"  # Use a football bouncing animation URL
     lottie_data = load_lottie_url(lottie_url)
     if lottie_data:
-        st_lottie(lottie_data, height=500, key="intro_lottie", quality="high", speed=0.8)
+        st_lottie(lottie_data, height=400, key="intro_lottie", quality="high", speed=0.8)
 
