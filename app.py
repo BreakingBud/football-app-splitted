@@ -1,6 +1,5 @@
 import streamlit as st
 import importlib
-import plotly.express as px
 from data_loader import load_data
 
 # Set up the app configuration
@@ -22,32 +21,34 @@ pages = {
     "Choropleth Map": "choropleth_map"
 }
 
-# Color palette options
-color_palettes = {
-    "Primary": ["#4285F4", "#34A853", "#FFBB33", "#FF4B4B"],
-    "Single Color (Blue)": ["#1f77b4"],
-    "Viridis": px.colors.sequential.Viridis
-}
-
-# Function to display a small color preview
-def display_palette_preview(palette):
-    # Display color previews directly in Streamlit
-    st.write("Color Palette Preview:")
-    for color in palette:
-        st.markdown(f'<div style="background-color: {color}; height: 30px; width: 100%;"></div>', unsafe_allow_html=True)
-
-# Sidebar for color theme selection
+# Color theme selection
 theme = st.sidebar.selectbox(
     "Choose your color theme",
-    options=list(color_palettes.keys())
+    ["Primary Color", "Single Color", "Color Blind"]
 )
 
 # Store the theme selection in session state
 st.session_state['theme'] = theme
 
-# Display color palette preview in sidebar
-st.sidebar.subheader("Color Palette Preview")
-display_palette_preview(color_palettes[theme])
+# Display color palette preview in the sidebar
+def display_palette_preview(theme):
+    import plotly.colors as pc
+
+    color_palettes = {
+        "Primary Color": pc.qualitative.Plotly,
+        "Single Color": ['#1f77b4', '#1f77b4', '#1f77b4', '#1f77b4'],  # Blue shades
+        "Color Blind": pc.qualitative.Set1
+    }
+
+    palette = color_palettes.get(theme, pc.qualitative.Plotly)
+    st.sidebar.subheader("Color Palette Preview")
+
+    if len(palette) > 0:
+        for color in palette:
+            st.sidebar.markdown(f'<div style="background-color: {color}; height: 15px; width: 100%; border-radius: 5px;"></div>', unsafe_allow_html=True)
+
+# Show color palette preview
+display_palette_preview(st.session_state.get('theme', "Primary Color"))
 
 # Radio buttons for page selection
 selected_page = st.sidebar.radio("Go to", list(pages.keys()))
