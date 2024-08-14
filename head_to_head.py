@@ -10,7 +10,7 @@ try:
     goalscorers_df, results_df, shootouts_df = load_data()
 except Exception as e:
     st.error(f"Error loading data: {e}")
-    st.stop()
+    st.stop()  # Stop the app if data loading fails
 
 def show_page():
     st.title("Head-to-Head Analysis")
@@ -19,8 +19,12 @@ def show_page():
     """)
 
     # Ensure the 'date' column is in datetime format and clean the data
-    results_df['date'] = pd.to_datetime(results_df['date'], errors='coerce')
-    results_df = results_df.dropna(subset=['date'])
+    if 'date' in results_df.columns:
+        results_df['date'] = pd.to_datetime(results_df['date'], errors='coerce')
+        results_df = results_df.dropna(subset=['date'])
+    else:
+        st.error("The 'date' column is missing in the results data.")
+        return
 
     # Set minimum and maximum dates for the slider
     min_date = results_df['date'].min()
