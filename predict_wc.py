@@ -1,32 +1,51 @@
-import pandas as pd
-from sklearn.preprocessing import LabelEncoder, StandardScaler
-from sklearn.model_selection import train_test_split
+import streamlit as st
+import numpy as np
+from preprocess import load_and_preprocess_data
+from model import train_model
 
-def load_and_preprocess_data(zip_file_path, extract_path):
-    # Load data from the provided CSV files within the zip archive
-    goalscorers_df = pd.read_csv(f'{extract_path}/goalscorers.csv')
-    results_df = pd.read_csv(f'{extract_path}/results.csv')
-    shootouts_df = pd.read_csv(f'{extract_path}/shootouts.csv')
+# Load and preprocess data
+zip_file_path = 'football_data_matches_scorers_shootouts.zip'
+extract_path = '/tmp/extracted_data'
+X_train, X_test, y_train, y_test, label_encoders, scaler, team_encoder = load_and_preprocess_data(zip_file_path, extract_path)
 
-    # Encode categorical variables
-    label_encoders = {}
-    categorical_columns = ['home_team', 'away_team', 'tournament', 'country', 'city']
-    for col in categorical_columns:
-        le = LabelEncoder()
-        results_df[col] = le.fit_transform(results_df[col])
-        label_encoders[col] = le
+# Train the model
+model = train_model(X_train, y_train, X_train.shape[1])
 
-    # Scale numeric variables
-    scaler = StandardScaler()
-    numeric_columns = ['home_score', 'away_score', 'home_possession', 'away_possession']
-    results_df[numeric_columns] = scaler.fit_transform(results_df[numeric_columns])
+st.title("FIFA World Cup Knockout Stage Prediction")
 
-    # Define features and target variable
-    X = results_df[['home_team', 'away_team', 'home_score', 'away_score', 'tournament']]
-    y = (results_df['home_score'] > results_df['away_score']).astype(int)  # 1 if home team wins, 0 otherwise
+# Define the bracket structure based on group winners and runners-up
+st.subheader("Select the 16 teams that qualified for the knockout stage")
+teams = []
+for i in range(16):
+    team = st.selectbox(f"Team {i+1}", options=team_encoder.classes_, key=f"team_{i}")
+    teams.append(team)
 
-    # Split the data into training and test sets
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+# Ensure 16 teams are selected
+if len(teams) == 16:
+    # Define initial match pairings based on the bracket structure
+    matches = [
+        (teams[0], teams[15]), (teams[7], teams[8]),
+        (teams[4], teams[11]), (teams[3], teams[12]),
+        (teams[2], teams[13]), (teams[5], teams[10]),
+        (teams[6], teams[9]), (teams[1], teams[14])
+    ]
 
-    return X_train, X_test, y_train, y_test, label_encoders, scaler, label_encoders['home_team']
+    # Predict the winners for each match
+    winners = []
+    for match in matches:
+        home_team_encoded = team_encoder.transform([match[0]])[0]
+        away_team_encoded = team_encoder.transform([match[1]])[0]
+        input_data = np.array([[home_team_encoded, away_team_encoded, 0, 0, 0]])  # Example input data
+        input_data = scaler.transform(input_data)
 
+        prediction = model.predict(input_data)
+        winner = match[0] if prediction[0][0] > 0.5 else match[1]
+        winners.append(winner)
+
+    st.write("### Predicted Winners of the Knockout Stage")
+    for i, match in enumerate(matches):
+        st.write(f"Match {i+1}: {match[0]} vs {match[1]} -> **{winners[i]}**")
+
+    st.write("### Bracket Progression")
+    for i in range(0, len(winners), 2):
+        st.write(f"Quarterfinal Match {i//2+1}: {winners[i]} vs {winners[i+1]}")
