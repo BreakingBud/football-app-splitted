@@ -9,7 +9,7 @@ def show_page():
     Please select your preferred color theme from the options below and navigate through the app using the menu.
     """)
 
-    # Horizontal color theme selection with smaller palette preview
+    # Horizontal color theme selection
     st.markdown("### Choose your color theme:")
     
     # Define the available color themes
@@ -28,27 +28,17 @@ def show_page():
     # Display selected color palette in a small, subtle way
     st.markdown("### Selected Color Palette:")
     color_theme = get_color_theme(selected_palette)
-    cols = st.columns(len(color_theme))
-    for idx, color in enumerate(color_theme):
-        cols[idx].markdown(f'<div style="background-color: {color}; height: 30px; width: 30px; border-radius: 5px;"></div>', unsafe_allow_html=True)
+    st.markdown(
+        "".join(
+            f'<span style="background-color: {color}; height: 20px; width: 20px; display: inline-block; margin-right: 5px; border-radius: 3px;"></span>'
+            for color in color_theme
+        ),
+        unsafe_allow_html=True,
+    )
 
-    # Display a Lottie animation at the bottom right corner
-    lottie_url = "https://assets5.lottiefiles.com/packages/lf20_YXD37q.json"
+    # Display a larger Lottie animation at the bottom
+    lottie_url = "https://assets10.lottiefiles.com/packages/lf20_gn0tojcq.json"  # Use a football bouncing animation URL
     lottie_data = load_lottie_url(lottie_url)
     if lottie_data:
-        st.markdown(
-            f"""
-            <div style="position: fixed; bottom: 0px; right: 0px;">
-                {st_lottie(lottie_data, height=100, key="intro_lottie", quality="high", speed=0.8)}
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-    # Display a brief description of the app
-    st.markdown("""
-    This application provides an in-depth analysis of football matches. 
-    You can compare teams head-to-head, analyze individual match statistics, and review team performance.
-    Use the sidebar to navigate between different analysis pages.
-    """)
+        st_lottie(lottie_data, height=400, key="intro_lottie", quality="high", speed=0.8)
 
