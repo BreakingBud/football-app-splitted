@@ -13,12 +13,7 @@ st.set_page_config(
 st.sidebar.title("Navigation")
 selected_page = st.sidebar.radio("Go to", list(PAGE_TITLES.keys()))
 
-# Load the selected page as a module
+# Load the selected page as a module and display it
 page_module = PAGE_TITLES[selected_page]
-
-# Import the selected page as a module and run the show_page() function
-try:
-    module = importlib.import_module(page_module)
-    module.show_page()
-except Exception as e:
-    st.error(f"Error loading page '{selected_page}': {e}")
+module = importlib.import_module(page_module)
+module.show_page()
