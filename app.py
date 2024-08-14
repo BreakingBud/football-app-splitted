@@ -3,15 +3,15 @@ import importlib
 from constants import PAGE_TITLES
 from data_loader import load_data
 
-# Load the data
-goalscorers_df, results_df, shootouts_df = load_data()
-
 # Set up the app configuration
 st.set_page_config(
     page_title="Football Analysis App",
     layout="wide",
     initial_sidebar_state="expanded",
 )
+
+# Load the data
+goalscorers_df, results_df, shootouts_df = load_data()
 
 # Sidebar for navigation
 st.sidebar.title("Navigation")
