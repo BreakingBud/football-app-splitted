@@ -18,7 +18,7 @@ def show_page():
     Please select your preferred color theme from the options below and navigate through the app using the menu.
     """)
 
-    # Horizontal color theme selection
+    # Horizontal color theme selection with smaller palette preview
     st.markdown("### Choose your color theme:")
     
     color_palettes = {
@@ -36,24 +36,17 @@ def show_page():
     # Store the theme selection in session state
     st.session_state['theme'] = selected_palette
 
-    # Display selected color palette
+    # Display selected color palette in a small, subtle way
     st.markdown("### Selected Color Palette:")
     cols = st.columns(len(color_palettes[selected_palette]))
     for idx, color in enumerate(color_palettes[selected_palette]):
-        cols[idx].markdown(f'<div style="background-color: {color}; height: 30px; border-radius: 5px;"></div>', unsafe_allow_html=True)
+        cols[idx].markdown(f'<div style="background-color: {color}; height: 20px; width: 20px; border-radius: 50%;"></div>', unsafe_allow_html=True)
 
     # Display a Lottie animation at the bottom right corner
     lottie_url = "https://assets5.lottiefiles.com/packages/lf20_YXD37q.json"
     lottie_data = load_lottie_url(lottie_url)
     if lottie_data:
-        st.markdown(
-            f"""
-            <div style="position: fixed; bottom: 0px; right: 0px;">
-                {st_lottie(lottie_data, height=100, key="intro_lottie")}
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+        st_lottie(lottie_data, height=150, key="intro_lottie", quality="high", speed=0.8)
 
     # Display a brief description of the app
     st.markdown("""
