@@ -6,13 +6,19 @@ from data_loader import load_data
 from helpers import get_color_theme
 
 # Attempt to load the data
+data_loaded = False
 try:
     goalscorers_df, results_df, shootouts_df = load_data()
+    data_loaded = True
 except Exception as e:
     st.error(f"Error loading data: {e}")
-    st.stop()  # Stop the app if data loading fails
+    st.stop()
 
 def show_page():
+    if not data_loaded or results_df.empty:
+        st.error("Data could not be loaded. Please check the data source and try again.")
+        return
+
     st.title("Head-to-Head Analysis")
     st.markdown("""
     Compare the performance of two teams across various matches. Use the filters to customize your analysis.
