@@ -40,7 +40,7 @@ if len(teams) == 16:
     # Draw the bracket programmatically
     image = Image.new('RGB', (1000, 1000), (255, 255, 255))
     draw = ImageDraw.Draw(image)
-    font = ImageFont.truetype("arial.ttf", 20)  # Replace with a path to a suitable font if needed
+    font = ImageFont.load_default()  # Use default PIL font
 
     # Define positions for the text
     positions = [
