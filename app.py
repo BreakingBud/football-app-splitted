@@ -2,15 +2,15 @@ import streamlit as st
 import importlib
 from data_loader import load_data
 
-# Load data
-goalscorers_df, results_df, shootouts_df = load_data()
-
-# Set up the app configuration
+# Set up the app configuration at the start of the script
 st.set_page_config(
     page_title="Football Analysis App",
     layout="wide",
     initial_sidebar_state="expanded",
 )
+
+# Load data
+goalscorers_df, results_df, shootouts_df = load_data()
 
 # Sidebar for navigation
 st.sidebar.title("Navigation")
