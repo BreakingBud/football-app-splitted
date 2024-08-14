@@ -1,5 +1,4 @@
 import streamlit as st
-import numpy as np
 import traceback
 from preprocess import load_and_preprocess_data
 from model import train_model
@@ -8,7 +7,18 @@ try:
     # Load and preprocess data
     zip_file_path = 'football_data_matches_scorers_shootouts.zip'
     extract_path = '/tmp/extracted_data'
-    X_train, X_test, y_train, y_test, label_encoders, scaler, team_encoder = load_and_preprocess_data(zip_file_path, extract_path)
+    
+    # Check the number of returned values from the function
+    unpacked_values = load_and_preprocess_data(zip_file_path, extract_path)
+    st.write(f"Returned values count: {len(unpacked_values)}")
+    st.write(f"Returned values: {unpacked_values}")
+
+    # Unpack the values
+    if len(unpacked_values) == 7:
+        X_train, X_test, y_train, y_test, label_encoders, scaler, team_encoder = unpacked_values
+    else:
+        st.error("Unexpected number of values returned from load_and_preprocess_data()")
+        raise ValueError("Unexpected number of values returned from load_and_preprocess_data()")
 
     # Train the model
     model = train_model(X_train, y_train, X_train.shape[1])
