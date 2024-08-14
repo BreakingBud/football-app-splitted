@@ -7,7 +7,10 @@ from model import create_model
 # Load and preprocess data
 zip_file_path = 'football_data_matches_scorers_shootouts.zip'
 extract_path = '/tmp/extracted_data'
-results_df, label_encoders, scaler, team_encoder = load_and_preprocess_data(zip_file_path, extract_path)
+results_df, label_encoders, scaler = load_and_preprocess_data(zip_file_path, extract_path)
+
+# Create team encoder
+team_encoder = label_encoders['home_team']
 
 st.title("FIFA World Cup Knockout Stage Prediction")
 
@@ -106,4 +109,7 @@ if len(teams) == 16:
     for i, winner in enumerate(winners_quarterfinals):
         draw.text(positions[12+i], winner, font=font, fill="black")
 
-    draw.te
+    draw.text(positions[14], final_winner, font=font, fill="black")
+
+    # Display the filled bracket image
+    s
